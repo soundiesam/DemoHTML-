@@ -204,8 +204,11 @@
         }
         .ticker-preview span {
             display: inline-block;
-            animation: scroll 15s linear infinite;
+            animation: scroll 120s linear infinite;
         }
+        .ticker-preview.speed-slow span { animation-duration: 1000s; }
+        .ticker-preview.speed-medium span { animation-duration: 120s; }
+        .ticker-preview.speed-fast span { animation-duration: 45s; }
         @keyframes scroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -376,6 +379,7 @@
             
             updateFeedItems(state.items);
             updateTickerStatus(state.visible);
+            updateTickerPreviewSpeed();
         });
         
         function updateSettings() {
@@ -516,6 +520,14 @@
                 status.textContent = 'Ticker: Hidden';
             }
         }
+        
+        function updateTickerPreviewSpeed() {
+            const preview = document.querySelector('.ticker-preview');
+            const speed = document.getElementById('tickerSpeed').value;
+            preview.className = 'ticker-preview speed-' + speed;
+        }
+        
+        document.getElementById('tickerSpeed').addEventListener('change', updateTickerPreviewSpeed);
         
         document.querySelectorAll('#line1, #line2, #position, #textSize, #duration').forEach(el => {
             el.addEventListener('change', updatePreview);
