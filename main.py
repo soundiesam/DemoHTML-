@@ -24,6 +24,7 @@ ticker_state = {
     'items': [],
     'position': 'bottom',
     'textSize': 'medium',
+    'speed': 'medium',
     'visible': False,
     'lastFetch': None
 }

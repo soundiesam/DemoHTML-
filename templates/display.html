@@ -96,6 +96,9 @@
             color: #ffffff;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
+        .ticker.speed-slow .ticker-content { animation-duration: 60s; }
+        .ticker.speed-medium .ticker-content { animation-duration: 30s; }
+        .ticker.speed-fast .ticker-content { animation-duration: 15s; }
         .ticker-content span {
             padding: 0 50px;
         }
@@ -170,6 +173,7 @@
             ticker.className = 'ticker';
             ticker.classList.add('pos-' + state.position);
             ticker.classList.add('size-' + state.textSize);
+            ticker.classList.add('speed-' + (state.speed || 'medium'));
             
             if (state.items && state.items.length > 0) {
                 tickerContent.innerHTML = state.items.map(item => `<span>${item}</span>`).join('');

@@ -313,6 +313,17 @@
                     </select>
                 </div>
             </div>
+            <div class="row">
+                <div>
+                    <label for="tickerSpeed">Scroll Speed</label>
+                    <select id="tickerSpeed">
+                        <option value="slow">Slow</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="fast">Fast</option>
+                    </select>
+                </div>
+                <div></div>
+            </div>
         </div>
         
         <div class="button-group">
@@ -361,6 +372,7 @@
             document.getElementById('feedUrl').value = state.feedUrl || '';
             document.getElementById('tickerPosition').value = state.position;
             document.getElementById('tickerTextSize').value = state.textSize;
+            document.getElementById('tickerSpeed').value = state.speed || 'medium';
             
             updateFeedItems(state.items);
             updateTickerStatus(state.visible);
@@ -474,7 +486,8 @@
         function updateTickerSettings() {
             const state = {
                 position: document.getElementById('tickerPosition').value,
-                textSize: document.getElementById('tickerTextSize').value
+                textSize: document.getElementById('tickerTextSize').value,
+                speed: document.getElementById('tickerSpeed').value
             };
             
             fetch('/api/ticker', {
