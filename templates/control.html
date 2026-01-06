@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lower Third Control Panel</title>
+    <title>Overlay Control Panel</title>
     <style>
         * {
             box-sizing: border-box;
@@ -18,13 +18,21 @@
             color: #fff;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         h1 {
             text-align: center;
             margin-bottom: 30px;
             color: #00d4ff;
+        }
+        .section-title {
+            text-align: center;
+            margin: 40px 0 20px;
+            color: #ff9f43;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #ff9f43;
+            padding-bottom: 10px;
         }
         .control-group {
             background: rgba(255, 255, 255, 0.1);
@@ -37,12 +45,15 @@
             color: #00d4ff;
             font-size: 1.2rem;
         }
+        .control-group.ticker h2 {
+            color: #ff9f43;
+        }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
         }
-        input[type="text"], select, input[type="number"] {
+        input[type="text"], input[type="url"], select, input[type="number"] {
             width: 100%;
             padding: 12px;
             border: none;
@@ -52,7 +63,7 @@
             font-size: 1rem;
             margin-bottom: 15px;
         }
-        input[type="text"]::placeholder {
+        input[type="text"]::placeholder, input[type="url"]::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
         select {
@@ -101,6 +112,14 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(46, 213, 115, 0.4);
         }
+        .btn-refresh {
+            background: linear-gradient(135deg, #ff9f43 0%, #cc7a00 100%);
+            color: #000;
+        }
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 159, 67, 0.4);
+        }
         .status {
             text-align: center;
             padding: 15px;
@@ -141,7 +160,10 @@
         }
         .display-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
         }
         .display-link a {
             color: #00d4ff;
@@ -158,11 +180,43 @@
         .row > div {
             flex: 1;
         }
+        .feed-items {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        .feed-items p {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .feed-items p:last-child {
+            border-bottom: none;
+        }
+        .ticker-preview {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-left: 4px solid #ff9f43;
+        }
+        .ticker-preview span {
+            display: inline-block;
+            animation: scroll 15s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Lower Third Control Panel</h1>
+        <h1>Overlay Control Panel</h1>
+        
+        <h2 class="section-title">Lower Third</h2>
         
         <div class="control-group">
             <h2>Text Content</h2>
@@ -223,6 +277,62 @@
             </div>
         </div>
         
+        <h2 class="section-title">RSS Ticker</h2>
+        
+        <div class="control-group ticker">
+            <h2>RSS Feed</h2>
+            <label for="feedUrl">RSS Feed URL</label>
+            <input type="url" id="feedUrl" placeholder="https://example.com/rss.xml">
+            
+            <div class="button-group">
+                <button class="btn-refresh" onclick="loadFeed()">Load Feed</button>
+            </div>
+            
+            <label style="margin-top: 15px;">Feed Items</label>
+            <div id="feedItems" class="feed-items">
+                <p>No feed loaded. Enter a URL and click "Load Feed".</p>
+            </div>
+        </div>
+        
+        <div class="control-group ticker">
+            <h2>Ticker Appearance</h2>
+            <div class="row">
+                <div>
+                    <label for="tickerPosition">Position</label>
+                    <select id="tickerPosition">
+                        <option value="bottom">Bottom</option>
+                        <option value="top">Top</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="tickerTextSize">Text Size</label>
+                    <select id="tickerTextSize">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-update" onclick="updateTickerSettings()">Update Ticker</button>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-show" onclick="showTicker()">Show Ticker</button>
+            <button class="btn-hide" onclick="hideTicker()">Hide Ticker</button>
+        </div>
+        
+        <div id="tickerStatus" class="status hidden">Ticker: Hidden</div>
+        
+        <div class="control-group ticker">
+            <h2>Ticker Preview</h2>
+            <div class="ticker-preview">
+                <span id="tickerPreviewText">Sample ticker text will scroll here...</span>
+            </div>
+        </div>
+        
         <div class="display-link">
             <a href="/display" target="_blank">Open Display Window (for OBS/streaming)</a>
         </div>
@@ -245,6 +355,15 @@
             
             updatePreview();
             updateStatusDisplay(state.visible);
+        });
+        
+        socket.on('ticker_update', (state) => {
+            document.getElementById('feedUrl').value = state.feedUrl || '';
+            document.getElementById('tickerPosition').value = state.position;
+            document.getElementById('tickerTextSize').value = state.textSize;
+            
+            updateFeedItems(state.items);
+            updateTickerStatus(state.visible);
         });
         
         function updateSettings() {
@@ -321,7 +440,71 @@
             }
         }
         
-        document.querySelectorAll('input, select').forEach(el => {
+        function loadFeed() {
+            const feedUrl = document.getElementById('feedUrl').value;
+            if (!feedUrl) {
+                alert('Please enter an RSS feed URL');
+                return;
+            }
+            
+            fetch('/api/ticker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ feedUrl: feedUrl })
+            }).then(res => res.json())
+              .then(data => {
+                  updateFeedItems(data.items);
+              });
+        }
+        
+        function updateFeedItems(items) {
+            const container = document.getElementById('feedItems');
+            const previewText = document.getElementById('tickerPreviewText');
+            
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p>No items found in feed.</p>';
+                previewText.textContent = 'No feed items loaded...';
+                return;
+            }
+            
+            container.innerHTML = items.map(item => `<p>${item}</p>`).join('');
+            previewText.textContent = items.join('  |  ');
+        }
+        
+        function updateTickerSettings() {
+            const state = {
+                position: document.getElementById('tickerPosition').value,
+                textSize: document.getElementById('tickerTextSize').value
+            };
+            
+            fetch('/api/ticker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(state)
+            });
+        }
+        
+        function showTicker() {
+            updateTickerSettings();
+            socket.emit('ticker_show');
+        }
+        
+        function hideTicker() {
+            socket.emit('ticker_hide');
+        }
+        
+        function updateTickerStatus(visible) {
+            const status = document.getElementById('tickerStatus');
+            if (visible) {
+                status.className = 'status visible';
+                status.textContent = 'Ticker: Visible';
+            } else {
+                status.className = 'status hidden';
+                status.textContent = 'Ticker: Hidden';
+            }
+        }
+        
+        document.querySelectorAll('#line1, #line2, #position, #textSize, #duration').forEach(el => {
             el.addEventListener('change', updatePreview);
             el.addEventListener('input', updatePreview);
         });

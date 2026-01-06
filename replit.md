@@ -1,10 +1,10 @@
-# Lower Third HTML5 App
+# Overlay Control App
 
 ## Overview
-An HTML5 application for creating and controlling Lower Third graphics, designed for streaming/broadcasting use. Can run on localhost with configurable port and is ready for Docker deployment.
+An HTML5 application for creating and controlling streaming overlays (Lower Thirds and RSS Ticker), designed for broadcasting use. Can run on localhost with configurable port and is ready for Docker deployment.
 
 ## Features
-- **Control Page** (`/`): Web interface to manage Lower Third settings
+- **Control Page** (`/`): Web interface to manage overlay elements
 - **Display Page** (`/display`): Transparent background overlay for OBS/streaming software
 
 ### Lower Third Controls
@@ -13,6 +13,13 @@ An HTML5 application for creating and controlling Lower Third graphics, designed
 - Text sizes: small, medium, large, extra large
 - Auto-hide duration (0 = manual control)
 - Show/Hide buttons for manual triggering
+
+### RSS Ticker Controls
+- RSS feed URL input with load button
+- Position options: top, bottom
+- Text sizes: small, medium, large
+- Show/Hide buttons for manual triggering
+- Scrolling ticker animation with feed headlines
 
 ## Project Structure
 ```

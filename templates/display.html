@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lower Third Display</title>
+    <title>Overlay Display</title>
     <style>
         * {
             margin: 0;
@@ -59,6 +59,61 @@
         .pos-top-left { top: 80px; left: 50px; }
         .pos-top-center { top: 80px; left: 50%; }
         .pos-top-right { top: 80px; right: 50px; }
+        
+        .ticker {
+            position: fixed;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 20, 0.9) 100%);
+            border-top: 3px solid #ff9f43;
+            padding: 15px 0;
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker.pos-top {
+            top: 0;
+            bottom: auto;
+            border-top: none;
+            border-bottom: 3px solid #ff9f43;
+            transform: translateY(-100%);
+        }
+        .ticker.pos-bottom {
+            bottom: 0;
+            top: auto;
+        }
+        .ticker.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker-scroll 30s linear infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .ticker-content span {
+            padding: 0 50px;
+        }
+        .ticker-content span::after {
+            content: '|';
+            padding-left: 50px;
+            color: #ff9f43;
+        }
+        .ticker-content span:last-child::after {
+            content: '';
+        }
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker.size-small { font-size: 18px; padding: 10px 0; }
+        .ticker.size-medium { font-size: 24px; padding: 15px 0; }
+        .ticker.size-large { font-size: 32px; padding: 20px 0; }
     </style>
 </head>
 <body>
@@ -67,10 +122,17 @@
         <div class="line2">Software Engineer</div>
     </div>
     
+    <div id="ticker" class="ticker pos-bottom size-medium">
+        <div class="ticker-content" id="tickerContent">
+        </div>
+    </div>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
     <script>
         const socket = io();
         const lt = document.getElementById('lowerThird');
+        const ticker = document.getElementById('ticker');
+        const tickerContent = document.getElementById('tickerContent');
         let hideTimeout = null;
         
         socket.on('connect', () => {
@@ -101,6 +163,24 @@
             } else {
                 lt.classList.remove('visible');
                 lt.classList.remove('center');
+            }
+        });
+        
+        socket.on('ticker_update', (state) => {
+            ticker.className = 'ticker';
+            ticker.classList.add('pos-' + state.position);
+            ticker.classList.add('size-' + state.textSize);
+            
+            if (state.items && state.items.length > 0) {
+                tickerContent.innerHTML = state.items.map(item => `<span>${item}</span>`).join('');
+            } else {
+                tickerContent.innerHTML = '';
+            }
+            
+            if (state.visible && state.items && state.items.length > 0) {
+                ticker.classList.add('visible');
+            } else {
+                ticker.classList.remove('visible');
             }
         });
     </script>
