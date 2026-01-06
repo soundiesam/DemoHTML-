@@ -14,6 +14,7 @@ lower_third_state = {
     'line2': 'Software Engineer',
     'position': 'bottom-left',
     'textSize': 'medium',
+    'font': 'Segoe UI',
     'duration': 5,
     'visible': False
 }
@@ -24,6 +25,7 @@ ticker_state = {
     'position': 'bottom',
     'textSize': 'medium',
     'speed': 'medium',
+    'font': 'Segoe UI',
     'visible': False,
     'lastFetch': None
 }
@@ -41,6 +43,8 @@ title_card_state = {
     'subtitle': '',
     'backgroundColor': '#000000',
     'textColor': '#ffffff',
+    'backgroundImage': '',
+    'font': 'Segoe UI',
     'visible': False
 }
 
@@ -52,11 +56,13 @@ social_bar_state = {
     'tiktok': '',
     'website': '',
     'position': 'bottom',
+    'font': 'Segoe UI',
     'visible': False
 }
 
 breaking_news_state = {
     'text': 'BREAKING NEWS',
+    'font': 'Segoe UI',
     'visible': False
 }
 

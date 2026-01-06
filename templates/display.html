@@ -315,6 +315,7 @@
             lt.className = 'lower-third';
             lt.classList.add('pos-' + state.position);
             lt.classList.add('size-' + state.textSize);
+            lt.style.fontFamily = state.font || 'Segoe UI';
             
             if (state.visible) {
                 lt.classList.add('visible');
@@ -337,6 +338,7 @@
             ticker.classList.add('pos-' + state.position);
             ticker.classList.add('size-' + state.textSize);
             ticker.classList.add('speed-' + (state.speed || 'medium'));
+            ticker.style.fontFamily = state.font || 'Segoe UI';
             
             if (state.items && state.items.length > 0) {
                 tickerContent.innerHTML = state.items.map(item => `<span>${item}</span>`).join('');
@@ -372,8 +374,13 @@
         
         // Title Card
         socket.on('titlecard_update', (state) => {
-            titleCard.style.backgroundColor = state.backgroundColor;
+            if (state.backgroundImage) {
+                titleCard.style.background = `url('${state.backgroundImage}') center/cover`;
+            } else {
+                titleCard.style.background = state.backgroundColor;
+            }
             titleCard.style.color = state.textColor;
+            titleCard.style.fontFamily = state.font || 'Segoe UI';
             document.getElementById('titleCardTitle').textContent = state.title;
             document.getElementById('titleCardSubtitle').textContent = state.subtitle || '';
             
@@ -396,6 +403,7 @@
         
         socket.on('social_update', (state) => {
             socialBar.className = 'social-bar pos-' + state.position;
+            socialBar.style.fontFamily = state.font || 'Segoe UI';
             
             let html = '';
             if (state.twitter) html += `<div class="social-item">${socialIcons.twitter}<span>${state.twitter}</span></div>`;
@@ -417,6 +425,7 @@
         // Breaking News
         socket.on('breaking_update', (state) => {
             breakingNews.textContent = state.text;
+            breakingNews.style.fontFamily = state.font || 'Segoe UI';
             
             if (state.visible) {
                 breakingNews.classList.add('visible');

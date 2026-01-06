@@ -316,6 +316,20 @@
             </div>
             <label for="duration">Auto-hide Duration (seconds, 0 = manual)</label>
             <input type="number" id="duration" value="5" min="0" max="60">
+            <label for="ltFont">Font</label>
+            <select id="ltFont">
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Impact">Impact</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Lucida Console">Lucida Console</option>
+            </select>
         </div>
         
         <div class="button-group">
@@ -371,7 +385,20 @@
                         <option value="fast">Fast</option>
                     </select>
                 </div>
-                <div></div>
+                <div>
+                    <label for="tickerFont">Font</label>
+                    <select id="tickerFont">
+                        <option value="Segoe UI">Segoe UI</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Impact">Impact</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </div>
             </div>
         </div>
         
@@ -443,6 +470,21 @@
                     <input type="color" id="titleTextColor" value="#ffffff">
                 </div>
             </div>
+            <label for="titleBgImage">Background Image URL (optional)</label>
+            <input type="url" id="titleBgImage" placeholder="https://example.com/background.jpg">
+            <label for="titleFont">Font</label>
+            <select id="titleFont">
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Impact">Impact</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Courier New">Courier New</option>
+            </select>
         </div>
         
         <div class="control-group green">
@@ -497,11 +539,27 @@
                     <input type="text" id="socialWebsite" placeholder="example.com">
                 </div>
             </div>
-            <label for="socialPosition">Position</label>
-            <select id="socialPosition">
-                <option value="top">Top</option>
-                <option value="bottom" selected>Bottom</option>
-            </select>
+            <div class="row">
+                <div>
+                    <label for="socialPosition">Position</label>
+                    <select id="socialPosition">
+                        <option value="top">Top</option>
+                        <option value="bottom" selected>Bottom</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="socialFont">Font</label>
+                    <select id="socialFont">
+                        <option value="Segoe UI">Segoe UI</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </div>
+            </div>
         </div>
         
         <div class="button-group">
@@ -520,6 +578,17 @@
             <h2>Breaking News</h2>
             <label for="breakingText">Breaking News Text</label>
             <input type="text" id="breakingText" placeholder="BREAKING NEWS: ..." value="BREAKING NEWS">
+            <label for="breakingFont">Font</label>
+            <select id="breakingFont">
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Impact">Impact</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+            </select>
         </div>
         
         <div class="control-group red">
@@ -554,6 +623,7 @@
             document.getElementById('position').value = state.position;
             document.getElementById('textSize').value = state.textSize;
             document.getElementById('duration').value = state.duration;
+            document.getElementById('ltFont').value = state.font || 'Segoe UI';
             updateStatus('ltStatus', 'Lower Third', state.visible);
         });
         
@@ -566,7 +636,8 @@
                     line2: document.getElementById('line2').value,
                     position: document.getElementById('position').value,
                     textSize: document.getElementById('textSize').value,
-                    duration: parseInt(document.getElementById('duration').value)
+                    duration: parseInt(document.getElementById('duration').value),
+                    font: document.getElementById('ltFont').value
                 })
             });
         }
@@ -580,6 +651,7 @@
             document.getElementById('tickerPosition').value = state.position;
             document.getElementById('tickerTextSize').value = state.textSize;
             document.getElementById('tickerSpeed').value = state.speed || 'medium';
+            document.getElementById('tickerFont').value = state.font || 'Segoe UI';
             updateFeedItems(state.items);
             updateStatus('tickerStatus', 'Ticker', state.visible);
         });
@@ -610,7 +682,8 @@
                 body: JSON.stringify({
                     position: document.getElementById('tickerPosition').value,
                     textSize: document.getElementById('tickerTextSize').value,
-                    speed: document.getElementById('tickerSpeed').value
+                    speed: document.getElementById('tickerSpeed').value,
+                    font: document.getElementById('tickerFont').value
                 })
             });
         }
@@ -654,20 +727,29 @@
             document.getElementById('subtitleText').value = state.subtitle || '';
             document.getElementById('titleBgColor').value = state.backgroundColor;
             document.getElementById('titleTextColor').value = state.textColor;
+            document.getElementById('titleBgImage').value = state.backgroundImage || '';
+            document.getElementById('titleFont').value = state.font || 'Segoe UI';
             updateTitlePreview();
             updateStatus('titleStatus', 'Title Card', state.visible);
         });
         
         function updateTitlePreview() {
             const preview = document.getElementById('titleCardPreview');
-            preview.style.background = document.getElementById('titleBgColor').value;
+            const bgImage = document.getElementById('titleBgImage').value;
+            if (bgImage) {
+                preview.style.background = `url('${bgImage}') center/cover`;
+            } else {
+                preview.style.background = document.getElementById('titleBgColor').value;
+            }
             preview.style.color = document.getElementById('titleTextColor').value;
+            preview.style.fontFamily = document.getElementById('titleFont').value;
             preview.querySelector('h3').textContent = document.getElementById('titleText').value;
             preview.querySelector('p').textContent = document.getElementById('subtitleText').value;
         }
         
-        ['titleText', 'subtitleText', 'titleBgColor', 'titleTextColor'].forEach(id => {
+        ['titleText', 'subtitleText', 'titleBgColor', 'titleTextColor', 'titleBgImage', 'titleFont'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateTitlePreview);
+            document.getElementById(id).addEventListener('change', updateTitlePreview);
         });
         
         function updateTitleCard() {
@@ -678,7 +760,9 @@
                     title: document.getElementById('titleText').value,
                     subtitle: document.getElementById('subtitleText').value,
                     backgroundColor: document.getElementById('titleBgColor').value,
-                    textColor: document.getElementById('titleTextColor').value
+                    textColor: document.getElementById('titleTextColor').value,
+                    backgroundImage: document.getElementById('titleBgImage').value,
+                    font: document.getElementById('titleFont').value
                 })
             });
         }
@@ -695,6 +779,7 @@
             document.getElementById('socialFacebook').value = state.facebook || '';
             document.getElementById('socialWebsite').value = state.website || '';
             document.getElementById('socialPosition').value = state.position;
+            document.getElementById('socialFont').value = state.font || 'Segoe UI';
             updateStatus('socialStatus', 'Social Bar', state.visible);
         });
         
@@ -709,7 +794,8 @@
                     tiktok: document.getElementById('socialTiktok').value,
                     facebook: document.getElementById('socialFacebook').value,
                     website: document.getElementById('socialWebsite').value,
-                    position: document.getElementById('socialPosition').value
+                    position: document.getElementById('socialPosition').value,
+                    font: document.getElementById('socialFont').value
                 })
             });
         }
@@ -720,7 +806,9 @@
         // Breaking News
         socket.on('breaking_update', (state) => {
             document.getElementById('breakingText').value = state.text;
+            document.getElementById('breakingFont').value = state.font || 'Segoe UI';
             document.getElementById('breakingPreview').textContent = state.text;
+            document.getElementById('breakingPreview').style.fontFamily = state.font || 'Segoe UI';
             updateStatus('breakingStatus', 'Breaking News', state.visible);
         });
         
@@ -728,12 +816,17 @@
             document.getElementById('breakingPreview').textContent = e.target.value;
         });
         
+        document.getElementById('breakingFont').addEventListener('change', (e) => {
+            document.getElementById('breakingPreview').style.fontFamily = e.target.value;
+        });
+        
         function updateBreaking() {
             fetch('/api/breaking', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: document.getElementById('breakingText').value
+                    text: document.getElementById('breakingText').value,
+                    font: document.getElementById('breakingFont').value
                 })
             });
         }
