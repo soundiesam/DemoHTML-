@@ -29,11 +29,16 @@
         .section-title {
             text-align: center;
             margin: 40px 0 20px;
-            color: #ff9f43;
             font-size: 1.5rem;
-            border-bottom: 2px solid #ff9f43;
+            border-bottom: 2px solid;
             padding-bottom: 10px;
         }
+        .section-title.cyan { color: #00d4ff; border-color: #00d4ff; }
+        .section-title.orange { color: #ff9f43; border-color: #ff9f43; }
+        .section-title.purple { color: #a855f7; border-color: #a855f7; }
+        .section-title.green { color: #22c55e; border-color: #22c55e; }
+        .section-title.pink { color: #ec4899; border-color: #ec4899; }
+        .section-title.red { color: #ef4444; border-color: #ef4444; }
         .control-group {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
@@ -42,18 +47,20 @@
         }
         .control-group h2 {
             margin-bottom: 15px;
-            color: #00d4ff;
             font-size: 1.2rem;
         }
-        .control-group.ticker h2 {
-            color: #ff9f43;
-        }
+        .control-group.cyan h2 { color: #00d4ff; }
+        .control-group.orange h2 { color: #ff9f43; }
+        .control-group.purple h2 { color: #a855f7; }
+        .control-group.green h2 { color: #22c55e; }
+        .control-group.pink h2 { color: #ec4899; }
+        .control-group.red h2 { color: #ef4444; }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
         }
-        input[type="text"], input[type="url"], select, input[type="number"] {
+        input[type="text"], input[type="url"], input[type="color"], select, input[type="number"], input[type="range"] {
             width: 100%;
             padding: 12px;
             border: none;
@@ -63,7 +70,14 @@
             font-size: 1rem;
             margin-bottom: 15px;
         }
-        input[type="text"]::placeholder, input[type="url"]::placeholder {
+        input[type="color"] {
+            height: 50px;
+            cursor: pointer;
+        }
+        input[type="range"] {
+            padding: 5px;
+        }
+        input::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
         select {
@@ -213,24 +227,70 @@
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
         }
+        .logo-preview {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-preview img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .title-card-preview {
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .title-card-preview h3 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .title-card-preview p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        .breaking-preview {
+            background: #dc2626;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            text-align: center;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .range-value {
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.7);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Overlay Control Panel</h1>
         
-        <h2 class="section-title">Lower Third</h2>
+        <!-- LOWER THIRD -->
+        <h2 class="section-title cyan">Lower Third</h2>
         
-        <div class="control-group">
+        <div class="control-group cyan">
             <h2>Text Content</h2>
             <label for="line1">Line 1 (Name)</label>
             <input type="text" id="line1" placeholder="Enter name..." value="John Smith">
-            
             <label for="line2">Line 2 (Title)</label>
             <input type="text" id="line2" placeholder="Enter title..." value="Software Engineer">
         </div>
         
-        <div class="control-group">
+        <div class="control-group cyan">
             <h2>Appearance</h2>
             <div class="row">
                 <div>
@@ -254,50 +314,36 @@
                     </select>
                 </div>
             </div>
-            
             <label for="duration">Auto-hide Duration (seconds, 0 = manual)</label>
             <input type="number" id="duration" value="5" min="0" max="60">
         </div>
         
         <div class="button-group">
-            <button class="btn-update" onclick="updateSettings()">Update Settings</button>
+            <button class="btn-update" onclick="updateLowerThird()">Update Settings</button>
         </div>
-        
         <div class="button-group">
-            <button class="btn-show" onclick="showLowerThird()">Show Lower Third</button>
-            <button class="btn-hide" onclick="hideLowerThird()">Hide Lower Third</button>
+            <button class="btn-show" onclick="showLowerThird()">Show</button>
+            <button class="btn-hide" onclick="hideLowerThird()">Hide</button>
         </div>
+        <div id="ltStatus" class="status hidden">Lower Third: Hidden</div>
         
-        <div id="status" class="status hidden">Lower Third: Hidden</div>
+        <!-- RSS TICKER -->
+        <h2 class="section-title orange">RSS Ticker</h2>
         
-        <div class="control-group">
-            <h2>Preview</h2>
-            <div class="preview-box">
-                <div id="preview" class="preview-lt" style="bottom: 20px; left: 20px;">
-                    <div class="line1">John Smith</div>
-                    <div class="line2">Software Engineer</div>
-                </div>
-            </div>
-        </div>
-        
-        <h2 class="section-title">RSS Ticker</h2>
-        
-        <div class="control-group ticker">
+        <div class="control-group orange">
             <h2>RSS Feed</h2>
             <label for="feedUrl">RSS Feed URL</label>
             <input type="url" id="feedUrl" placeholder="https://example.com/rss.xml">
-            
             <div class="button-group">
                 <button class="btn-refresh" onclick="loadFeed()">Load Feed</button>
             </div>
-            
             <label style="margin-top: 15px;">Feed Items</label>
             <div id="feedItems" class="feed-items">
                 <p>No feed loaded. Enter a URL and click "Load Feed".</p>
             </div>
         </div>
         
-        <div class="control-group ticker">
+        <div class="control-group orange">
             <h2>Ticker Appearance</h2>
             <div class="row">
                 <div>
@@ -330,22 +376,165 @@
         </div>
         
         <div class="button-group">
-            <button class="btn-update" onclick="updateTickerSettings()">Update Ticker</button>
+            <button class="btn-update" onclick="updateTicker()">Update Ticker</button>
+        </div>
+        <div class="button-group">
+            <button class="btn-show" onclick="showTicker()">Show</button>
+            <button class="btn-hide" onclick="hideTicker()">Hide</button>
+        </div>
+        <div id="tickerStatus" class="status hidden">Ticker: Hidden</div>
+        
+        <!-- LOGO BUG -->
+        <h2 class="section-title purple">Logo Bug</h2>
+        
+        <div class="control-group purple">
+            <h2>Logo Settings</h2>
+            <label for="logoUrl">Logo Image URL</label>
+            <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
+            <div class="row">
+                <div>
+                    <label for="logoPosition">Position</label>
+                    <select id="logoPosition">
+                        <option value="top-left">Top Left</option>
+                        <option value="top-right" selected>Top Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="logoSize">Size</label>
+                    <select id="logoSize">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+            </div>
+            <label for="logoOpacity">Opacity</label>
+            <input type="range" id="logoOpacity" min="10" max="100" value="100">
+            <div class="range-value"><span id="opacityValue">100</span>%</div>
         </div>
         
         <div class="button-group">
-            <button class="btn-show" onclick="showTicker()">Show Ticker</button>
-            <button class="btn-hide" onclick="hideTicker()">Hide Ticker</button>
+            <button class="btn-update" onclick="updateLogo()">Update Logo</button>
         </div>
+        <div class="button-group">
+            <button class="btn-show" onclick="showLogo()">Show</button>
+            <button class="btn-hide" onclick="hideLogo()">Hide</button>
+        </div>
+        <div id="logoStatus" class="status hidden">Logo: Hidden</div>
         
-        <div id="tickerStatus" class="status hidden">Ticker: Hidden</div>
+        <!-- TITLE CARD -->
+        <h2 class="section-title green">Full-Screen Title Card</h2>
         
-        <div class="control-group ticker">
-            <h2>Ticker Preview</h2>
-            <div class="ticker-preview">
-                <span id="tickerPreviewText">Sample ticker text will scroll here...</span>
+        <div class="control-group green">
+            <h2>Title Card Content</h2>
+            <label for="titleText">Title</label>
+            <input type="text" id="titleText" placeholder="Welcome" value="Welcome">
+            <label for="subtitleText">Subtitle (optional)</label>
+            <input type="text" id="subtitleText" placeholder="To the show...">
+            <div class="row">
+                <div>
+                    <label for="titleBgColor">Background Color</label>
+                    <input type="color" id="titleBgColor" value="#000000">
+                </div>
+                <div>
+                    <label for="titleTextColor">Text Color</label>
+                    <input type="color" id="titleTextColor" value="#ffffff">
+                </div>
             </div>
         </div>
+        
+        <div class="control-group green">
+            <h2>Preview</h2>
+            <div id="titleCardPreview" class="title-card-preview" style="background: #000; color: #fff;">
+                <h3>Welcome</h3>
+                <p></p>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-update" onclick="updateTitleCard()">Update Title Card</button>
+        </div>
+        <div class="button-group">
+            <button class="btn-show" onclick="showTitleCard()">Show</button>
+            <button class="btn-hide" onclick="hideTitleCard()">Hide</button>
+        </div>
+        <div id="titleStatus" class="status hidden">Title Card: Hidden</div>
+        
+        <!-- SOCIAL MEDIA BAR -->
+        <h2 class="section-title pink">Social Media Bar</h2>
+        
+        <div class="control-group pink">
+            <h2>Social Handles</h2>
+            <div class="row">
+                <div>
+                    <label for="socialTwitter">Twitter/X</label>
+                    <input type="text" id="socialTwitter" placeholder="@username">
+                </div>
+                <div>
+                    <label for="socialYoutube">YouTube</label>
+                    <input type="text" id="socialYoutube" placeholder="@channel">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="socialInstagram">Instagram</label>
+                    <input type="text" id="socialInstagram" placeholder="@username">
+                </div>
+                <div>
+                    <label for="socialTiktok">TikTok</label>
+                    <input type="text" id="socialTiktok" placeholder="@username">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="socialFacebook">Facebook</label>
+                    <input type="text" id="socialFacebook" placeholder="pagename">
+                </div>
+                <div>
+                    <label for="socialWebsite">Website</label>
+                    <input type="text" id="socialWebsite" placeholder="example.com">
+                </div>
+            </div>
+            <label for="socialPosition">Position</label>
+            <select id="socialPosition">
+                <option value="top">Top</option>
+                <option value="bottom" selected>Bottom</option>
+            </select>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-update" onclick="updateSocial()">Update Social Bar</button>
+        </div>
+        <div class="button-group">
+            <button class="btn-show" onclick="showSocial()">Show</button>
+            <button class="btn-hide" onclick="hideSocial()">Hide</button>
+        </div>
+        <div id="socialStatus" class="status hidden">Social Bar: Hidden</div>
+        
+        <!-- BREAKING NEWS -->
+        <h2 class="section-title red">Breaking News Banner</h2>
+        
+        <div class="control-group red">
+            <h2>Breaking News</h2>
+            <label for="breakingText">Breaking News Text</label>
+            <input type="text" id="breakingText" placeholder="BREAKING NEWS: ..." value="BREAKING NEWS">
+        </div>
+        
+        <div class="control-group red">
+            <h2>Preview</h2>
+            <div id="breakingPreview" class="breaking-preview">BREAKING NEWS</div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-update" onclick="updateBreaking()">Update Banner</button>
+        </div>
+        <div class="button-group">
+            <button class="btn-show" onclick="showBreaking()">Show</button>
+            <button class="btn-hide" onclick="hideBreaking()">Hide</button>
+        </div>
+        <div id="breakingStatus" class="status hidden">Breaking News: Hidden</div>
         
         <div class="display-link">
             <a href="/display" target="_blank">Open Display Window (for OBS/streaming)</a>
@@ -356,183 +545,208 @@
     <script>
         const socket = io();
         
-        socket.on('connect', () => {
-            console.log('Connected to server');
-        });
+        socket.on('connect', () => console.log('Connected to server'));
         
+        // Lower Third
         socket.on('state_update', (state) => {
             document.getElementById('line1').value = state.line1;
             document.getElementById('line2').value = state.line2;
             document.getElementById('position').value = state.position;
             document.getElementById('textSize').value = state.textSize;
             document.getElementById('duration').value = state.duration;
-            
-            updatePreview();
-            updateStatusDisplay(state.visible);
+            updateStatus('ltStatus', 'Lower Third', state.visible);
         });
         
+        function updateLowerThird() {
+            fetch('/api/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    line1: document.getElementById('line1').value,
+                    line2: document.getElementById('line2').value,
+                    position: document.getElementById('position').value,
+                    textSize: document.getElementById('textSize').value,
+                    duration: parseInt(document.getElementById('duration').value)
+                })
+            });
+        }
+        
+        function showLowerThird() { updateLowerThird(); socket.emit('show'); }
+        function hideLowerThird() { socket.emit('hide'); }
+        
+        // Ticker
         socket.on('ticker_update', (state) => {
             document.getElementById('feedUrl').value = state.feedUrl || '';
             document.getElementById('tickerPosition').value = state.position;
             document.getElementById('tickerTextSize').value = state.textSize;
             document.getElementById('tickerSpeed').value = state.speed || 'medium';
-            
             updateFeedItems(state.items);
-            updateTickerStatus(state.visible);
-            updateTickerPreviewSpeed();
+            updateStatus('tickerStatus', 'Ticker', state.visible);
         });
-        
-        function updateSettings() {
-            const state = {
-                line1: document.getElementById('line1').value,
-                line2: document.getElementById('line2').value,
-                position: document.getElementById('position').value,
-                textSize: document.getElementById('textSize').value,
-                duration: parseInt(document.getElementById('duration').value)
-            };
-            
-            fetch('/api/state', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(state)
-            });
-            
-            updatePreview();
-        }
-        
-        function showLowerThird() {
-            updateSettings();
-            socket.emit('show');
-        }
-        
-        function hideLowerThird() {
-            socket.emit('hide');
-        }
-        
-        function updateStatusDisplay(visible) {
-            const status = document.getElementById('status');
-            if (visible) {
-                status.className = 'status visible';
-                status.textContent = 'Lower Third: Visible';
-            } else {
-                status.className = 'status hidden';
-                status.textContent = 'Lower Third: Hidden';
-            }
-        }
-        
-        function updatePreview() {
-            const preview = document.getElementById('preview');
-            const line1 = document.getElementById('line1').value;
-            const line2 = document.getElementById('line2').value;
-            const position = document.getElementById('position').value;
-            const textSize = document.getElementById('textSize').value;
-            
-            preview.querySelector('.line1').textContent = line1;
-            preview.querySelector('.line2').textContent = line2;
-            
-            const sizes = {
-                small: { line1: '16px', line2: '14px' },
-                medium: { line1: '24px', line2: '18px' },
-                large: { line1: '32px', line2: '24px' },
-                xlarge: { line1: '42px', line2: '32px' }
-            };
-            
-            preview.querySelector('.line1').style.fontSize = sizes[textSize].line1;
-            preview.querySelector('.line2').style.fontSize = sizes[textSize].line2;
-            
-            preview.style.top = '';
-            preview.style.bottom = '';
-            preview.style.left = '';
-            preview.style.right = '';
-            preview.style.transform = '';
-            
-            if (position.includes('bottom')) preview.style.bottom = '20px';
-            if (position.includes('top')) preview.style.top = '20px';
-            if (position.includes('left')) preview.style.left = '20px';
-            if (position.includes('right')) preview.style.right = '20px';
-            if (position.includes('center')) {
-                preview.style.left = '50%';
-                preview.style.transform = 'translateX(-50%)';
-            }
-        }
         
         function loadFeed() {
             const feedUrl = document.getElementById('feedUrl').value;
-            if (!feedUrl) {
-                alert('Please enter an RSS feed URL');
-                return;
-            }
-            
+            if (!feedUrl) { alert('Please enter an RSS feed URL'); return; }
             fetch('/api/ticker', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ feedUrl: feedUrl })
-            }).then(res => res.json())
-              .then(data => {
-                  updateFeedItems(data.items);
-              });
+            }).then(res => res.json()).then(data => updateFeedItems(data.items));
         }
         
         function updateFeedItems(items) {
             const container = document.getElementById('feedItems');
-            const previewText = document.getElementById('tickerPreviewText');
-            
             if (!items || items.length === 0) {
                 container.innerHTML = '<p>No items found in feed.</p>';
-                previewText.textContent = 'No feed items loaded...';
                 return;
             }
-            
             container.innerHTML = items.map(item => `<p>${item}</p>`).join('');
-            previewText.textContent = items.join('  |  ');
         }
         
-        function updateTickerSettings() {
-            const state = {
-                position: document.getElementById('tickerPosition').value,
-                textSize: document.getElementById('tickerTextSize').value,
-                speed: document.getElementById('tickerSpeed').value
-            };
-            
+        function updateTicker() {
             fetch('/api/ticker', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(state)
+                body: JSON.stringify({
+                    position: document.getElementById('tickerPosition').value,
+                    textSize: document.getElementById('tickerTextSize').value,
+                    speed: document.getElementById('tickerSpeed').value
+                })
             });
         }
         
-        function showTicker() {
-            updateTickerSettings();
-            socket.emit('ticker_show');
-        }
+        function showTicker() { updateTicker(); socket.emit('ticker_show'); }
+        function hideTicker() { socket.emit('ticker_hide'); }
         
-        function hideTicker() {
-            socket.emit('ticker_hide');
-        }
-        
-        function updateTickerStatus(visible) {
-            const status = document.getElementById('tickerStatus');
-            if (visible) {
-                status.className = 'status visible';
-                status.textContent = 'Ticker: Visible';
-            } else {
-                status.className = 'status hidden';
-                status.textContent = 'Ticker: Hidden';
-            }
-        }
-        
-        function updateTickerPreviewSpeed() {
-            const preview = document.querySelector('.ticker-preview');
-            const speed = document.getElementById('tickerSpeed').value;
-            preview.className = 'ticker-preview speed-' + speed;
-        }
-        
-        document.getElementById('tickerSpeed').addEventListener('change', updateTickerPreviewSpeed);
-        
-        document.querySelectorAll('#line1, #line2, #position, #textSize, #duration').forEach(el => {
-            el.addEventListener('change', updatePreview);
-            el.addEventListener('input', updatePreview);
+        // Logo
+        socket.on('logo_update', (state) => {
+            document.getElementById('logoUrl').value = state.imageUrl || '';
+            document.getElementById('logoPosition').value = state.position;
+            document.getElementById('logoSize').value = state.size;
+            document.getElementById('logoOpacity').value = state.opacity;
+            document.getElementById('opacityValue').textContent = state.opacity;
+            updateStatus('logoStatus', 'Logo', state.visible);
         });
+        
+        document.getElementById('logoOpacity').addEventListener('input', (e) => {
+            document.getElementById('opacityValue').textContent = e.target.value;
+        });
+        
+        function updateLogo() {
+            fetch('/api/logo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    imageUrl: document.getElementById('logoUrl').value,
+                    position: document.getElementById('logoPosition').value,
+                    size: document.getElementById('logoSize').value,
+                    opacity: parseInt(document.getElementById('logoOpacity').value)
+                })
+            });
+        }
+        
+        function showLogo() { updateLogo(); socket.emit('logo_show'); }
+        function hideLogo() { socket.emit('logo_hide'); }
+        
+        // Title Card
+        socket.on('titlecard_update', (state) => {
+            document.getElementById('titleText').value = state.title;
+            document.getElementById('subtitleText').value = state.subtitle || '';
+            document.getElementById('titleBgColor').value = state.backgroundColor;
+            document.getElementById('titleTextColor').value = state.textColor;
+            updateTitlePreview();
+            updateStatus('titleStatus', 'Title Card', state.visible);
+        });
+        
+        function updateTitlePreview() {
+            const preview = document.getElementById('titleCardPreview');
+            preview.style.background = document.getElementById('titleBgColor').value;
+            preview.style.color = document.getElementById('titleTextColor').value;
+            preview.querySelector('h3').textContent = document.getElementById('titleText').value;
+            preview.querySelector('p').textContent = document.getElementById('subtitleText').value;
+        }
+        
+        ['titleText', 'subtitleText', 'titleBgColor', 'titleTextColor'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateTitlePreview);
+        });
+        
+        function updateTitleCard() {
+            fetch('/api/titlecard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: document.getElementById('titleText').value,
+                    subtitle: document.getElementById('subtitleText').value,
+                    backgroundColor: document.getElementById('titleBgColor').value,
+                    textColor: document.getElementById('titleTextColor').value
+                })
+            });
+        }
+        
+        function showTitleCard() { updateTitleCard(); socket.emit('titlecard_show'); }
+        function hideTitleCard() { socket.emit('titlecard_hide'); }
+        
+        // Social Bar
+        socket.on('social_update', (state) => {
+            document.getElementById('socialTwitter').value = state.twitter || '';
+            document.getElementById('socialYoutube').value = state.youtube || '';
+            document.getElementById('socialInstagram').value = state.instagram || '';
+            document.getElementById('socialTiktok').value = state.tiktok || '';
+            document.getElementById('socialFacebook').value = state.facebook || '';
+            document.getElementById('socialWebsite').value = state.website || '';
+            document.getElementById('socialPosition').value = state.position;
+            updateStatus('socialStatus', 'Social Bar', state.visible);
+        });
+        
+        function updateSocial() {
+            fetch('/api/social', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    twitter: document.getElementById('socialTwitter').value,
+                    youtube: document.getElementById('socialYoutube').value,
+                    instagram: document.getElementById('socialInstagram').value,
+                    tiktok: document.getElementById('socialTiktok').value,
+                    facebook: document.getElementById('socialFacebook').value,
+                    website: document.getElementById('socialWebsite').value,
+                    position: document.getElementById('socialPosition').value
+                })
+            });
+        }
+        
+        function showSocial() { updateSocial(); socket.emit('social_show'); }
+        function hideSocial() { socket.emit('social_hide'); }
+        
+        // Breaking News
+        socket.on('breaking_update', (state) => {
+            document.getElementById('breakingText').value = state.text;
+            document.getElementById('breakingPreview').textContent = state.text;
+            updateStatus('breakingStatus', 'Breaking News', state.visible);
+        });
+        
+        document.getElementById('breakingText').addEventListener('input', (e) => {
+            document.getElementById('breakingPreview').textContent = e.target.value;
+        });
+        
+        function updateBreaking() {
+            fetch('/api/breaking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: document.getElementById('breakingText').value
+                })
+            });
+        }
+        
+        function showBreaking() { updateBreaking(); socket.emit('breaking_show'); }
+        function hideBreaking() { socket.emit('breaking_hide'); }
+        
+        // Helper
+        function updateStatus(elementId, name, visible) {
+            const status = document.getElementById(elementId);
+            status.className = visible ? 'status visible' : 'status hidden';
+            status.textContent = `${name}: ${visible ? 'Visible' : 'Hidden'}`;
+        }
     </script>
 </body>
 </html>

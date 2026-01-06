@@ -15,7 +15,10 @@
             height: 100%;
             overflow: hidden;
             background: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        /* Lower Third */
         .lower-third {
             position: fixed;
             background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
@@ -25,6 +28,7 @@
             transform: translateX(-100%);
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            z-index: 100;
         }
         .lower-third.visible {
             opacity: 1;
@@ -34,13 +38,11 @@
             transform: translateX(-50%);
         }
         .lower-third .line1 {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-weight: 700;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         .lower-third .line2 {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #00d4ff;
             margin-top: 5px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
@@ -60,6 +62,7 @@
         .pos-top-center { top: 80px; left: 50%; }
         .pos-top-right { top: 80px; right: 50px; }
         
+        /* Ticker */
         .ticker {
             position: fixed;
             left: 0;
@@ -72,6 +75,7 @@
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
             white-space: nowrap;
+            z-index: 90;
         }
         .ticker.pos-top {
             top: 0;
@@ -92,13 +96,9 @@
             display: inline-block;
             padding-left: 100%;
             animation: ticker-scroll 30s linear infinite;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #ffffff;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
-        .ticker.speed-slow .ticker-content { animation-duration: 1000s; }
-        .ticker.speed-medium .ticker-content { animation-duration: 120s; }
-        .ticker.speed-fast .ticker-content { animation-duration: 45s; }
         .ticker-content span {
             padding: 0 50px;
         }
@@ -114,20 +114,182 @@
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
+        .ticker.speed-slow .ticker-content { animation-duration: 1000s; }
+        .ticker.speed-medium .ticker-content { animation-duration: 120s; }
+        .ticker.speed-fast .ticker-content { animation-duration: 45s; }
         .ticker.size-small { font-size: 18px; padding: 10px 0; }
         .ticker.size-medium { font-size: 24px; padding: 15px 0; }
         .ticker.size-large { font-size: 32px; padding: 20px 0; }
+        
+        /* Logo Bug */
+        .logo-bug {
+            position: fixed;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s ease;
+            z-index: 200;
+        }
+        .logo-bug.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .logo-bug img {
+            display: block;
+        }
+        .logo-bug.pos-top-left { top: 30px; left: 30px; }
+        .logo-bug.pos-top-right { top: 30px; right: 30px; }
+        .logo-bug.pos-bottom-left { bottom: 30px; left: 30px; }
+        .logo-bug.pos-bottom-right { bottom: 30px; right: 30px; }
+        .logo-bug.size-small img { width: 60px; height: auto; }
+        .logo-bug.size-medium img { width: 100px; height: auto; }
+        .logo-bug.size-large img { width: 150px; height: auto; }
+        
+        /* Title Card */
+        .title-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: all 0.5s ease;
+            z-index: 300;
+            pointer-events: none;
+        }
+        .title-card.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .title-card h1 {
+            font-size: 5rem;
+            font-weight: 700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        .title-card p {
+            font-size: 2rem;
+            opacity: 0.8;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Social Media Bar */
+        .social-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 95;
+        }
+        .social-bar.pos-top {
+            top: 0;
+            border-bottom: 3px solid #ec4899;
+            transform: translateY(-100%);
+        }
+        .social-bar.pos-bottom {
+            bottom: 0;
+            border-top: 3px solid #ec4899;
+            transform: translateY(100%);
+        }
+        .social-bar.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .social-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+        .social-item svg {
+            width: 24px;
+            height: 24px;
+            fill: #ec4899;
+        }
+        
+        /* Breaking News */
+        .breaking-news {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%) scaleY(0);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 25px 50px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 250;
+            box-shadow: 0 10px 50px rgba(220, 38, 38, 0.5);
+        }
+        .breaking-news.visible {
+            opacity: 1;
+            transform: translateY(-50%) scaleY(1);
+            animation: breaking-pulse 1s ease-in-out infinite;
+        }
+        @keyframes breaking-pulse {
+            0%, 100% { box-shadow: 0 10px 50px rgba(220, 38, 38, 0.5); }
+            50% { box-shadow: 0 10px 80px rgba(220, 38, 38, 0.8); }
+        }
+        .breaking-news::before,
+        .breaking-news::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: repeating-linear-gradient(90deg, #fbbf24, #fbbf24 20px, #dc2626 20px, #dc2626 40px);
+        }
+        .breaking-news::before { top: 0; }
+        .breaking-news::after { bottom: 0; }
     </style>
 </head>
 <body>
+    <!-- Lower Third -->
     <div id="lowerThird" class="lower-third pos-bottom-left size-medium">
         <div class="line1">John Smith</div>
         <div class="line2">Software Engineer</div>
     </div>
     
-    <div id="ticker" class="ticker pos-bottom size-medium">
-        <div class="ticker-content" id="tickerContent">
-        </div>
+    <!-- Ticker -->
+    <div id="ticker" class="ticker pos-bottom size-medium speed-medium">
+        <div class="ticker-content" id="tickerContent"></div>
+    </div>
+    
+    <!-- Logo Bug -->
+    <div id="logoBug" class="logo-bug pos-top-right size-medium">
+        <img id="logoImage" src="" alt="Logo">
+    </div>
+    
+    <!-- Title Card -->
+    <div id="titleCard" class="title-card">
+        <h1 id="titleCardTitle">Welcome</h1>
+        <p id="titleCardSubtitle"></p>
+    </div>
+    
+    <!-- Social Bar -->
+    <div id="socialBar" class="social-bar pos-bottom">
+    </div>
+    
+    <!-- Breaking News -->
+    <div id="breakingNews" class="breaking-news">
+        BREAKING NEWS
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
@@ -136,12 +298,16 @@
         const lt = document.getElementById('lowerThird');
         const ticker = document.getElementById('ticker');
         const tickerContent = document.getElementById('tickerContent');
+        const logoBug = document.getElementById('logoBug');
+        const logoImage = document.getElementById('logoImage');
+        const titleCard = document.getElementById('titleCard');
+        const socialBar = document.getElementById('socialBar');
+        const breakingNews = document.getElementById('breakingNews');
         let hideTimeout = null;
         
-        socket.on('connect', () => {
-            console.log('Display connected');
-        });
+        socket.on('connect', () => console.log('Display connected'));
         
+        // Lower Third
         socket.on('state_update', (state) => {
             lt.querySelector('.line1').textContent = state.line1;
             lt.querySelector('.line2').textContent = state.line2;
@@ -155,13 +321,9 @@
                 if (state.position.includes('center')) {
                     lt.classList.add('center');
                 }
-                
                 if (hideTimeout) clearTimeout(hideTimeout);
-                
                 if (state.duration > 0) {
-                    hideTimeout = setTimeout(() => {
-                        socket.emit('hide');
-                    }, state.duration * 1000);
+                    hideTimeout = setTimeout(() => socket.emit('hide'), state.duration * 1000);
                 }
             } else {
                 lt.classList.remove('visible');
@@ -169,6 +331,7 @@
             }
         });
         
+        // Ticker
         socket.on('ticker_update', (state) => {
             ticker.className = 'ticker';
             ticker.classList.add('pos-' + state.position);
@@ -185,6 +348,80 @@
                 ticker.classList.add('visible');
             } else {
                 ticker.classList.remove('visible');
+            }
+        });
+        
+        // Logo Bug
+        socket.on('logo_update', (state) => {
+            logoBug.className = 'logo-bug';
+            logoBug.classList.add('pos-' + state.position);
+            logoBug.classList.add('size-' + state.size);
+            logoBug.style.opacity = state.visible ? (state.opacity / 100) : 0;
+            
+            if (state.imageUrl) {
+                logoImage.src = state.imageUrl;
+            }
+            
+            if (state.visible && state.imageUrl) {
+                logoBug.classList.add('visible');
+                logoBug.style.opacity = state.opacity / 100;
+            } else {
+                logoBug.classList.remove('visible');
+            }
+        });
+        
+        // Title Card
+        socket.on('titlecard_update', (state) => {
+            titleCard.style.backgroundColor = state.backgroundColor;
+            titleCard.style.color = state.textColor;
+            document.getElementById('titleCardTitle').textContent = state.title;
+            document.getElementById('titleCardSubtitle').textContent = state.subtitle || '';
+            
+            if (state.visible) {
+                titleCard.classList.add('visible');
+            } else {
+                titleCard.classList.remove('visible');
+            }
+        });
+        
+        // Social Bar
+        const socialIcons = {
+            twitter: '<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+            youtube: '<svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+            instagram: '<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>',
+            facebook: '<svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
+            tiktok: '<svg viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
+            website: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>'
+        };
+        
+        socket.on('social_update', (state) => {
+            socialBar.className = 'social-bar pos-' + state.position;
+            
+            let html = '';
+            if (state.twitter) html += `<div class="social-item">${socialIcons.twitter}<span>${state.twitter}</span></div>`;
+            if (state.youtube) html += `<div class="social-item">${socialIcons.youtube}<span>${state.youtube}</span></div>`;
+            if (state.instagram) html += `<div class="social-item">${socialIcons.instagram}<span>${state.instagram}</span></div>`;
+            if (state.tiktok) html += `<div class="social-item">${socialIcons.tiktok}<span>${state.tiktok}</span></div>`;
+            if (state.facebook) html += `<div class="social-item">${socialIcons.facebook}<span>${state.facebook}</span></div>`;
+            if (state.website) html += `<div class="social-item">${socialIcons.website}<span>${state.website}</span></div>`;
+            
+            socialBar.innerHTML = html;
+            
+            if (state.visible && html) {
+                socialBar.classList.add('visible');
+            } else {
+                socialBar.classList.remove('visible');
+            }
+        });
+        
+        // Breaking News
+        socket.on('breaking_update', (state) => {
+            breakingNews.textContent = state.text;
+            
+            if (state.visible) {
+                breakingNews.classList.add('visible');
+            } else {
+                breakingNews.classList.remove('visible');
             }
         });
     </script>
