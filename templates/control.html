@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lower Third Control Panel</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00d4ff;
+        }
+        .control-group {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .control-group h2 {
+            margin-bottom: 15px;
+            color: #00d4ff;
+            font-size: 1.2rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="text"], select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        select {
+            cursor: pointer;
+        }
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-show {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: #000;
+        }
+        .btn-show:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        .btn-hide {
+            background: linear-gradient(135deg, #ff4757 0%, #cc0000 100%);
+            color: #fff;
+        }
+        .btn-hide:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
+        }
+        .btn-update {
+            background: linear-gradient(135deg, #2ed573 0%, #1e9c50 100%);
+            color: #000;
+        }
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(46, 213, 115, 0.4);
+        }
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        .status.visible {
+            background: rgba(46, 213, 115, 0.2);
+            border: 2px solid #2ed573;
+        }
+        .status.hidden {
+            background: rgba(255, 71, 87, 0.2);
+            border: 2px solid #ff4757;
+        }
+        .preview-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 40px;
+            margin-top: 20px;
+            position: relative;
+            min-height: 200px;
+        }
+        .preview-lt {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border-left: 4px solid #00d4ff;
+            padding: 15px 25px;
+            transition: all 0.3s ease;
+        }
+        .preview-lt .line1 {
+            font-weight: 700;
+            color: #fff;
+        }
+        .preview-lt .line2 {
+            color: #00d4ff;
+            margin-top: 5px;
+        }
+        .display-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .display-link a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        .display-link a:hover {
+            text-decoration: underline;
+        }
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+        .row > div {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lower Third Control Panel</h1>
+        
+        <div class="control-group">
+            <h2>Text Content</h2>
+            <label for="line1">Line 1 (Name)</label>
+            <input type="text" id="line1" placeholder="Enter name..." value="John Smith">
+            
+            <label for="line2">Line 2 (Title)</label>
+            <input type="text" id="line2" placeholder="Enter title..." value="Software Engineer">
+        </div>
+        
+        <div class="control-group">
+            <h2>Appearance</h2>
+            <div class="row">
+                <div>
+                    <label for="position">Position</label>
+                    <select id="position">
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="bottom-center">Bottom Center</option>
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="top-center">Top Center</option>
+                        <option value="top-right">Top Right</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="textSize">Text Size</label>
+                    <select id="textSize">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                        <option value="xlarge">Extra Large</option>
+                    </select>
+                </div>
+            </div>
+            
+            <label for="duration">Auto-hide Duration (seconds, 0 = manual)</label>
+            <input type="number" id="duration" value="5" min="0" max="60">
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-update" onclick="updateSettings()">Update Settings</button>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-show" onclick="showLowerThird()">Show Lower Third</button>
+            <button class="btn-hide" onclick="hideLowerThird()">Hide Lower Third</button>
+        </div>
+        
+        <div id="status" class="status hidden">Lower Third: Hidden</div>
+        
+        <div class="control-group">
+            <h2>Preview</h2>
+            <div class="preview-box">
+                <div id="preview" class="preview-lt" style="bottom: 20px; left: 20px;">
+                    <div class="line1">John Smith</div>
+                    <div class="line2">Software Engineer</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="display-link">
+            <a href="/display" target="_blank">Open Display Window (for OBS/streaming)</a>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+        
+        socket.on('state_update', (state) => {
+            document.getElementById('line1').value = state.line1;
+            document.getElementById('line2').value = state.line2;
+            document.getElementById('position').value = state.position;
+            document.getElementById('textSize').value = state.textSize;
+            document.getElementById('duration').value = state.duration;
+            
+            updatePreview();
+            updateStatusDisplay(state.visible);
+        });
+        
+        function updateSettings() {
+            const state = {
+                line1: document.getElementById('line1').value,
+                line2: document.getElementById('line2').value,
+                position: document.getElementById('position').value,
+                textSize: document.getElementById('textSize').value,
+                duration: parseInt(document.getElementById('duration').value)
+            };
+            
+            fetch('/api/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(state)
+            });
+            
+            updatePreview();
+        }
+        
+        function showLowerThird() {
+            updateSettings();
+            socket.emit('show');
+        }
+        
+        function hideLowerThird() {
+            socket.emit('hide');
+        }
+        
+        function updateStatusDisplay(visible) {
+            const status = document.getElementById('status');
+            if (visible) {
+                status.className = 'status visible';
+                status.textContent = 'Lower Third: Visible';
+            } else {
+                status.className = 'status hidden';
+                status.textContent = 'Lower Third: Hidden';
+            }
+        }
+        
+        function updatePreview() {
+            const preview = document.getElementById('preview');
+            const line1 = document.getElementById('line1').value;
+            const line2 = document.getElementById('line2').value;
+            const position = document.getElementById('position').value;
+            const textSize = document.getElementById('textSize').value;
+            
+            preview.querySelector('.line1').textContent = line1;
+            preview.querySelector('.line2').textContent = line2;
+            
+            const sizes = {
+                small: { line1: '16px', line2: '14px' },
+                medium: { line1: '24px', line2: '18px' },
+                large: { line1: '32px', line2: '24px' },
+                xlarge: { line1: '42px', line2: '32px' }
+            };
+            
+            preview.querySelector('.line1').style.fontSize = sizes[textSize].line1;
+            preview.querySelector('.line2').style.fontSize = sizes[textSize].line2;
+            
+            preview.style.top = '';
+            preview.style.bottom = '';
+            preview.style.left = '';
+            preview.style.right = '';
+            preview.style.transform = '';
+            
+            if (position.includes('bottom')) preview.style.bottom = '20px';
+            if (position.includes('top')) preview.style.top = '20px';
+            if (position.includes('left')) preview.style.left = '20px';
+            if (position.includes('right')) preview.style.right = '20px';
+            if (position.includes('center')) {
+                preview.style.left = '50%';
+                preview.style.transform = 'translateX(-50%)';
+            }
+        }
+        
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', updatePreview);
+            el.addEventListener('input', updatePreview);
+        });
+    </script>
+</body>
+</html>

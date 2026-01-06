@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lower Third Display</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+        .lower-third {
+            position: fixed;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border-left: 5px solid #00d4ff;
+            padding: 20px 35px;
+            opacity: 0;
+            transform: translateX(-100%);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+        .lower-third.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .lower-third.visible.center {
+            transform: translateX(-50%);
+        }
+        .lower-third .line1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .lower-third .line2 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #00d4ff;
+            margin-top: 5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .size-small .line1 { font-size: 20px; }
+        .size-small .line2 { font-size: 16px; }
+        .size-medium .line1 { font-size: 28px; }
+        .size-medium .line2 { font-size: 20px; }
+        .size-large .line1 { font-size: 38px; }
+        .size-large .line2 { font-size: 28px; }
+        .size-xlarge .line1 { font-size: 50px; }
+        .size-xlarge .line2 { font-size: 38px; }
+        .pos-bottom-left { bottom: 80px; left: 50px; }
+        .pos-bottom-center { bottom: 80px; left: 50%; }
+        .pos-bottom-right { bottom: 80px; right: 50px; }
+        .pos-top-left { top: 80px; left: 50px; }
+        .pos-top-center { top: 80px; left: 50%; }
+        .pos-top-right { top: 80px; right: 50px; }
+    </style>
+</head>
+<body>
+    <div id="lowerThird" class="lower-third pos-bottom-left size-medium">
+        <div class="line1">John Smith</div>
+        <div class="line2">Software Engineer</div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        const lt = document.getElementById('lowerThird');
+        let hideTimeout = null;
+        
+        socket.on('connect', () => {
+            console.log('Display connected');
+        });
+        
+        socket.on('state_update', (state) => {
+            lt.querySelector('.line1').textContent = state.line1;
+            lt.querySelector('.line2').textContent = state.line2;
+            
+            lt.className = 'lower-third';
+            lt.classList.add('pos-' + state.position);
+            lt.classList.add('size-' + state.textSize);
+            
+            if (state.visible) {
+                lt.classList.add('visible');
+                if (state.position.includes('center')) {
+                    lt.classList.add('center');
+                }
+                
+                if (hideTimeout) clearTimeout(hideTimeout);
+                
+                if (state.duration > 0) {
+                    hideTimeout = setTimeout(() => {
+                        socket.emit('hide');
+                    }, state.duration * 1000);
+                }
+            } else {
+                lt.classList.remove('visible');
+                lt.classList.remove('center');
+            }
+        });
+    </script>
+</body>
+</html>
