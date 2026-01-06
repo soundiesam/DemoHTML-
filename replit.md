@@ -18,8 +18,33 @@ An HTML5 application for creating and controlling streaming overlays (Lower Thir
 - RSS feed URL input with load button
 - Position options: top, bottom
 - Text sizes: small, medium, large
+- Speed control: slow, medium, fast
 - Show/Hide buttons for manual triggering
 - Scrolling ticker animation with feed headlines
+
+### Logo Bug
+- Image URL input for logo
+- Position options: top-left, top-right, bottom-left, bottom-right
+- Size options: small, medium, large
+- Opacity slider (10-100%)
+- Show/Hide buttons
+
+### Full-Screen Title Card
+- Title and subtitle text fields
+- Background color picker
+- Text color picker
+- Show/Hide buttons for segment transitions
+
+### Social Media Bar
+- Fields for Twitter/X, YouTube, Instagram, TikTok, Facebook, Website
+- Position options: top, bottom
+- Platform icons with handles
+- Show/Hide buttons
+
+### Breaking News Banner
+- Custom text input
+- Urgent red styling with pulsing animation
+- Show/Hide buttons for breaking announcements
 
 ## Project Structure
 ```
