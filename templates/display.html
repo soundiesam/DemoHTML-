@@ -18,16 +18,13 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        /* Lower Third */
+        /* Lower Third Base */
         .lower-third {
             position: fixed;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
-            border-left: 5px solid #00d4ff;
             padding: 20px 35px;
             opacity: 0;
             transform: translateX(-100%);
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
             z-index: 100;
         }
         .lower-third.visible {
@@ -39,11 +36,9 @@
         }
         .lower-third .line1 {
             font-weight: 700;
-            color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         .lower-third .line2 {
-            color: #00d4ff;
             margin-top: 5px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
@@ -61,6 +56,52 @@
         .pos-top-left { top: 80px; left: 50px; }
         .pos-top-center { top: 80px; left: 50%; }
         .pos-top-right { top: 80px; right: 50px; }
+        
+        /* Lower Third Styles */
+        .lower-third.style-modern {
+            background: linear-gradient(135deg, var(--lt-bg) 0%, var(--lt-bg-dark) 100%);
+            border-left: 5px solid var(--lt-accent);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+        .lower-third.style-classic {
+            background: var(--lt-bg);
+            border-left: 8px solid var(--lt-accent);
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+        }
+        .lower-third.style-minimal {
+            background: var(--lt-bg);
+            border-bottom: 3px solid var(--lt-accent);
+            box-shadow: none;
+        }
+        .lower-third.style-bold {
+            background: var(--lt-bg);
+            border-left: none;
+            padding: 25px 50px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+        }
+        .lower-third.style-news {
+            background: linear-gradient(90deg, var(--lt-accent) 0%, var(--lt-accent) 8px, var(--lt-bg) 8px);
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .lower-third.style-elegant {
+            background: transparent;
+            border: 2px solid var(--lt-accent);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+        }
+        .lower-third.style-neon {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--lt-accent);
+            box-shadow: 0 0 20px var(--lt-accent), 0 0 40px var(--lt-accent), inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .lower-third.style-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 4px solid var(--lt-accent);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
         
         /* Ticker */
         .ticker {
@@ -308,13 +349,43 @@
         socket.on('connect', () => console.log('Display connected'));
         
         // Lower Third
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+        
+        function darkenColor(hex, amount) {
+            let r = parseInt(hex.slice(1, 3), 16);
+            let g = parseInt(hex.slice(3, 5), 16);
+            let b = parseInt(hex.slice(5, 7), 16);
+            r = Math.max(0, r - amount);
+            g = Math.max(0, g - amount);
+            b = Math.max(0, b - amount);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
         socket.on('state_update', (state) => {
             lt.querySelector('.line1').textContent = state.line1;
             lt.querySelector('.line2').textContent = state.line2;
             
+            const bgColor = state.bgColor || '#1a1a2e';
+            const accentColor = state.accentColor || '#00d4ff';
+            const textColor = state.textColor || '#ffffff';
+            const style = state.style || 'modern';
+            
+            lt.style.setProperty('--lt-bg', hexToRgba(bgColor, 0.9));
+            lt.style.setProperty('--lt-bg-dark', darkenColor(bgColor, 30));
+            lt.style.setProperty('--lt-accent', accentColor);
+            
+            lt.querySelector('.line1').style.color = textColor;
+            lt.querySelector('.line2').style.color = accentColor;
+            
             lt.className = 'lower-third';
             lt.classList.add('pos-' + state.position);
             lt.classList.add('size-' + state.textSize);
+            lt.classList.add('style-' + style);
             lt.style.fontFamily = state.font || 'Segoe UI';
             
             if (state.visible) {

@@ -16,6 +16,10 @@ lower_third_state = {
     'textSize': 'medium',
     'font': 'Segoe UI',
     'duration': 5,
+    'style': 'modern',
+    'bgColor': '#1a1a2e',
+    'accentColor': '#00d4ff',
+    'textColor': '#ffffff',
     'visible': False
 }
 

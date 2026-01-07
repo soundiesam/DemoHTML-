@@ -291,7 +291,7 @@
         </div>
         
         <div class="control-group cyan">
-            <h2>Appearance</h2>
+            <h2>Layout</h2>
             <div class="row">
                 <div>
                     <label for="position">Position</label>
@@ -314,22 +314,59 @@
                     </select>
                 </div>
             </div>
-            <label for="duration">Auto-hide Duration (seconds, 0 = manual)</label>
-            <input type="number" id="duration" value="5" min="0" max="60">
-            <label for="ltFont">Font</label>
-            <select id="ltFont">
-                <option value="Segoe UI">Segoe UI</option>
-                <option value="Arial">Arial</option>
-                <option value="Helvetica">Helvetica</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Trebuchet MS">Trebuchet MS</option>
-                <option value="Impact">Impact</option>
-                <option value="Comic Sans MS">Comic Sans MS</option>
-                <option value="Courier New">Courier New</option>
-                <option value="Lucida Console">Lucida Console</option>
+            <div class="row">
+                <div>
+                    <label for="duration">Auto-hide (seconds, 0 = manual)</label>
+                    <input type="number" id="duration" value="5" min="0" max="60">
+                </div>
+                <div>
+                    <label for="ltFont">Font</label>
+                    <select id="ltFont">
+                        <option value="Segoe UI">Segoe UI</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Impact">Impact</option>
+                        <option value="Comic Sans MS">Comic Sans MS</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-group cyan">
+            <h2>Style</h2>
+            <label for="ltStyle">Style Preset</label>
+            <select id="ltStyle">
+                <option value="modern">Modern (Gradient)</option>
+                <option value="classic">Classic (Solid)</option>
+                <option value="minimal">Minimal (Clean)</option>
+                <option value="bold">Bold (Full Width)</option>
+                <option value="news">News (Bar Style)</option>
+                <option value="elegant">Elegant (Thin Border)</option>
+                <option value="neon">Neon (Glow Effect)</option>
+                <option value="glass">Glass (Transparent)</option>
             </select>
+            <div class="row">
+                <div>
+                    <label for="ltBgColor">Background Color</label>
+                    <input type="color" id="ltBgColor" value="#1a1a2e">
+                </div>
+                <div>
+                    <label for="ltAccentColor">Accent Color</label>
+                    <input type="color" id="ltAccentColor" value="#00d4ff">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="ltTextColor">Text Color</label>
+                    <input type="color" id="ltTextColor" value="#ffffff">
+                </div>
+                <div></div>
+            </div>
         </div>
         
         <div class="button-group">
@@ -624,6 +661,10 @@
             document.getElementById('textSize').value = state.textSize;
             document.getElementById('duration').value = state.duration;
             document.getElementById('ltFont').value = state.font || 'Segoe UI';
+            document.getElementById('ltStyle').value = state.style || 'modern';
+            document.getElementById('ltBgColor').value = state.bgColor || '#1a1a2e';
+            document.getElementById('ltAccentColor').value = state.accentColor || '#00d4ff';
+            document.getElementById('ltTextColor').value = state.textColor || '#ffffff';
             updateStatus('ltStatus', 'Lower Third', state.visible);
         });
         
@@ -637,7 +678,11 @@
                     position: document.getElementById('position').value,
                     textSize: document.getElementById('textSize').value,
                     duration: parseInt(document.getElementById('duration').value),
-                    font: document.getElementById('ltFont').value
+                    font: document.getElementById('ltFont').value,
+                    style: document.getElementById('ltStyle').value,
+                    bgColor: document.getElementById('ltBgColor').value,
+                    accentColor: document.getElementById('ltAccentColor').value,
+                    textColor: document.getElementById('ltTextColor').value
                 })
             });
         }
