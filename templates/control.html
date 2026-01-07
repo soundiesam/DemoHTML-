@@ -291,6 +291,18 @@
         </div>
         
         <div class="control-group cyan">
+            <h2>Image (Optional)</h2>
+            <label for="ltImageUrl">Image URL (logo, headshot, etc.)</label>
+            <input type="url" id="ltImageUrl" placeholder="https://example.com/photo.jpg">
+            <label for="ltImageShape">Image Shape</label>
+            <select id="ltImageShape">
+                <option value="square">Square</option>
+                <option value="circle">Circle</option>
+                <option value="rounded">Rounded</option>
+            </select>
+        </div>
+        
+        <div class="control-group cyan">
             <h2>Layout</h2>
             <div class="row">
                 <div>
@@ -665,6 +677,8 @@
             document.getElementById('ltBgColor').value = state.bgColor || '#1a1a2e';
             document.getElementById('ltAccentColor').value = state.accentColor || '#00d4ff';
             document.getElementById('ltTextColor').value = state.textColor || '#ffffff';
+            document.getElementById('ltImageUrl').value = state.imageUrl || '';
+            document.getElementById('ltImageShape').value = state.imageShape || 'square';
             updateStatus('ltStatus', 'Lower Third', state.visible);
         });
         
@@ -682,7 +696,9 @@
                     style: document.getElementById('ltStyle').value,
                     bgColor: document.getElementById('ltBgColor').value,
                     accentColor: document.getElementById('ltAccentColor').value,
-                    textColor: document.getElementById('ltTextColor').value
+                    textColor: document.getElementById('ltTextColor').value,
+                    imageUrl: document.getElementById('ltImageUrl').value,
+                    imageShape: document.getElementById('ltImageShape').value
                 })
             });
         }

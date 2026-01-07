@@ -26,6 +26,9 @@
             transform: translateX(-100%);
             transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
         .lower-third.visible {
             opacity: 1;
@@ -33,6 +36,21 @@
         }
         .lower-third.visible.center {
             transform: translateX(-50%);
+        }
+        .lt-image {
+            flex-shrink: 0;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .lt-image.shape-square { border-radius: 0; }
+        .lt-image.shape-circle { border-radius: 50%; }
+        .lt-image.shape-rounded { border-radius: 12px; }
+        .size-small .lt-image { width: 50px; height: 50px; }
+        .size-medium .lt-image { width: 70px; height: 70px; }
+        .size-large .lt-image { width: 90px; height: 90px; }
+        .size-xlarge .lt-image { width: 120px; height: 120px; }
+        .lt-text {
+            flex: 1;
         }
         .lower-third .line1 {
             font-weight: 700;
@@ -304,8 +322,11 @@
 <body>
     <!-- Lower Third -->
     <div id="lowerThird" class="lower-third pos-bottom-left size-medium">
-        <div class="line1">John Smith</div>
-        <div class="line2">Software Engineer</div>
+        <img id="ltImage" class="lt-image" src="" alt="" style="display: none;">
+        <div class="lt-text">
+            <div class="line1">John Smith</div>
+            <div class="line2">Software Engineer</div>
+        </div>
     </div>
     
     <!-- Ticker -->
@@ -337,6 +358,7 @@
     <script>
         const socket = io();
         const lt = document.getElementById('lowerThird');
+        const ltImage = document.getElementById('ltImage');
         const ticker = document.getElementById('ticker');
         const tickerContent = document.getElementById('tickerContent');
         const logoBug = document.getElementById('logoBug');
@@ -374,6 +396,8 @@
             const accentColor = state.accentColor || '#00d4ff';
             const textColor = state.textColor || '#ffffff';
             const style = state.style || 'modern';
+            const imageUrl = state.imageUrl || '';
+            const imageShape = state.imageShape || 'square';
             
             lt.style.setProperty('--lt-bg', hexToRgba(bgColor, 0.9));
             lt.style.setProperty('--lt-bg-dark', darkenColor(bgColor, 30));
@@ -381,6 +405,14 @@
             
             lt.querySelector('.line1').style.color = textColor;
             lt.querySelector('.line2').style.color = accentColor;
+            
+            if (imageUrl) {
+                ltImage.src = imageUrl;
+                ltImage.style.display = 'block';
+                ltImage.className = 'lt-image shape-' + imageShape;
+            } else {
+                ltImage.style.display = 'none';
+            }
             
             lt.className = 'lower-third';
             lt.classList.add('pos-' + state.position);

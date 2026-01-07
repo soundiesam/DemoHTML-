@@ -20,6 +20,8 @@ lower_third_state = {
     'bgColor': '#1a1a2e',
     'accentColor': '#00d4ff',
     'textColor': '#ffffff',
+    'imageUrl': '',
+    'imageShape': 'square',
     'visible': False
 }
 
