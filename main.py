@@ -251,6 +251,134 @@ def handle_breaking_hide():
     breaking_news_state['visible'] = False
     emit('breaking_update', breaking_news_state, broadcast=True)
 
+# HTTP GET endpoints for remote control
+@app.route('/api/lowerthird/show')
+def http_lt_show():
+    global lower_third_state
+    # Allow setting text via query params
+    if request.args.get('line1'):
+        lower_third_state['line1'] = request.args.get('line1')
+    if request.args.get('line2'):
+        lower_third_state['line2'] = request.args.get('line2')
+    if request.args.get('imageUrl'):
+        lower_third_state['imageUrl'] = request.args.get('imageUrl')
+    lower_third_state['visible'] = True
+    socketio.emit('state_update', lower_third_state)
+    return jsonify({'status': 'ok', 'visible': True})
+
+@app.route('/api/lowerthird/hide')
+def http_lt_hide():
+    global lower_third_state
+    lower_third_state['visible'] = False
+    socketio.emit('state_update', lower_third_state)
+    return jsonify({'status': 'ok', 'visible': False})
+
+@app.route('/api/lowerthird/update')
+def http_lt_update():
+    global lower_third_state
+    for key in ['line1', 'line2', 'position', 'textSize', 'font', 'style', 'bgColor', 'accentColor', 'textColor', 'imageUrl', 'imageShape']:
+        if request.args.get(key):
+            lower_third_state[key] = request.args.get(key)
+    if request.args.get('duration'):
+        lower_third_state['duration'] = int(request.args.get('duration'))
+    socketio.emit('state_update', lower_third_state)
+    return jsonify({'status': 'ok', 'state': lower_third_state})
+
+@app.route('/api/ticker/show')
+def http_ticker_show():
+    global ticker_state
+    ticker_state['visible'] = True
+    socketio.emit('ticker_update', ticker_state)
+    return jsonify({'status': 'ok', 'visible': True})
+
+@app.route('/api/ticker/hide')
+def http_ticker_hide():
+    global ticker_state
+    ticker_state['visible'] = False
+    socketio.emit('ticker_update', ticker_state)
+    return jsonify({'status': 'ok', 'visible': False})
+
+@app.route('/api/logo/show')
+def http_logo_show():
+    global logo_state
+    if request.args.get('imageUrl'):
+        logo_state['imageUrl'] = request.args.get('imageUrl')
+    logo_state['visible'] = True
+    socketio.emit('logo_update', logo_state)
+    return jsonify({'status': 'ok', 'visible': True})
+
+@app.route('/api/logo/hide')
+def http_logo_hide():
+    global logo_state
+    logo_state['visible'] = False
+    socketio.emit('logo_update', logo_state)
+    return jsonify({'status': 'ok', 'visible': False})
+
+@app.route('/api/titlecard/show')
+def http_titlecard_show():
+    global title_card_state
+    if request.args.get('title'):
+        title_card_state['title'] = request.args.get('title')
+    if request.args.get('subtitle'):
+        title_card_state['subtitle'] = request.args.get('subtitle')
+    title_card_state['visible'] = True
+    socketio.emit('titlecard_update', title_card_state)
+    return jsonify({'status': 'ok', 'visible': True})
+
+@app.route('/api/titlecard/hide')
+def http_titlecard_hide():
+    global title_card_state
+    title_card_state['visible'] = False
+    socketio.emit('titlecard_update', title_card_state)
+    return jsonify({'status': 'ok', 'visible': False})
+
+@app.route('/api/social/show')
+def http_social_show():
+    global social_bar_state
+    social_bar_state['visible'] = True
+    socketio.emit('social_update', social_bar_state)
+    return jsonify({'status': 'ok', 'visible': True})
+
+@app.route('/api/social/hide')
+def http_social_hide():
+    global social_bar_state
+    social_bar_state['visible'] = False
+    socketio.emit('social_update', social_bar_state)
+    return jsonify({'status': 'ok', 'visible': False})
+
+@app.route('/api/breaking/show')
+def http_breaking_show():
+    global breaking_news_state
+    if request.args.get('text'):
+        breaking_news_state['text'] = request.args.get('text')
+    breaking_news_state['visible'] = True
+    socketio.emit('breaking_update', breaking_news_state)
+    return jsonify({'status': 'ok', 'visible': True})
+
+@app.route('/api/breaking/hide')
+def http_breaking_hide():
+    global breaking_news_state
+    breaking_news_state['visible'] = False
+    socketio.emit('breaking_update', breaking_news_state)
+    return jsonify({'status': 'ok', 'visible': False})
+
+@app.route('/api/all/hide')
+def http_hide_all():
+    global lower_third_state, ticker_state, logo_state, title_card_state, social_bar_state, breaking_news_state
+    lower_third_state['visible'] = False
+    ticker_state['visible'] = False
+    logo_state['visible'] = False
+    title_card_state['visible'] = False
+    social_bar_state['visible'] = False
+    breaking_news_state['visible'] = False
+    socketio.emit('state_update', lower_third_state)
+    socketio.emit('ticker_update', ticker_state)
+    socketio.emit('logo_update', logo_state)
+    socketio.emit('titlecard_update', title_card_state)
+    socketio.emit('social_update', social_bar_state)
+    socketio.emit('breaking_update', breaking_news_state)
+    return jsonify({'status': 'ok', 'message': 'All elements hidden'})
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
