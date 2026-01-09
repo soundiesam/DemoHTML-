@@ -75,6 +75,35 @@
         .pos-top-center { top: 80px; left: 50%; }
         .pos-top-right { top: 80px; right: 50px; }
         
+        /* Full Width Mode */
+        .lower-third.width-full {
+            left: 0 !important;
+            right: 0 !important;
+            width: 100%;
+            transform: translateY(100%);
+        }
+        .lower-third.width-full.visible {
+            transform: translateY(0);
+        }
+        .lower-third.width-full.pos-top-left,
+        .lower-third.width-full.pos-top-center,
+        .lower-third.width-full.pos-top-right {
+            top: 0;
+            bottom: auto;
+            transform: translateY(-100%);
+        }
+        .lower-third.width-full.pos-top-left.visible,
+        .lower-third.width-full.pos-top-center.visible,
+        .lower-third.width-full.pos-top-right.visible {
+            transform: translateY(0);
+        }
+        .lower-third.width-full.pos-bottom-left,
+        .lower-third.width-full.pos-bottom-center,
+        .lower-third.width-full.pos-bottom-right {
+            bottom: 0;
+            top: auto;
+        }
+        
         /* Lower Third Styles */
         .lower-third.style-modern {
             background: linear-gradient(135deg, var(--lt-bg) 0%, var(--lt-bg-dark) 100%);
@@ -388,6 +417,20 @@
             return `rgb(${r}, ${g}, ${b})`;
         }
         
+        let currentCustomFont = '';
+        
+        function loadCustomFont(url, name) {
+            if (!url || !name || currentCustomFont === url) return;
+            currentCustomFont = url;
+            const fontFace = new FontFace(name, `url(${url})`);
+            fontFace.load().then(function(loaded) {
+                document.fonts.add(loaded);
+                console.log('Custom font loaded:', name);
+            }).catch(function(error) {
+                console.error('Error loading custom font:', error);
+            });
+        }
+        
         socket.on('state_update', (state) => {
             lt.querySelector('.line1').textContent = state.line1;
             lt.querySelector('.line2').textContent = state.line2;
@@ -396,6 +439,7 @@
             const accentColor = state.accentColor || '#00d4ff';
             const textColor = state.textColor || '#ffffff';
             const style = state.style || 'modern';
+            const width = state.width || 'compact';
             const imageUrl = state.imageUrl || '';
             const imageShape = state.imageShape || 'square';
             
@@ -414,15 +458,23 @@
                 ltImage.style.display = 'none';
             }
             
+            // Handle custom font
+            let fontFamily = state.font || 'Segoe UI';
+            if (state.font === 'custom' && state.customFontUrl && state.customFontName) {
+                loadCustomFont(state.customFontUrl, state.customFontName);
+                fontFamily = state.customFontName;
+            }
+            
             lt.className = 'lower-third';
             lt.classList.add('pos-' + state.position);
             lt.classList.add('size-' + state.textSize);
             lt.classList.add('style-' + style);
-            lt.style.fontFamily = state.font || 'Segoe UI';
+            lt.classList.add('width-' + width);
+            lt.style.fontFamily = fontFamily;
             
             if (state.visible) {
                 lt.classList.add('visible');
-                if (state.position.includes('center')) {
+                if (state.position.includes('center') && width !== 'full') {
                     lt.classList.add('center');
                 }
                 if (hideTimeout) clearTimeout(hideTimeout);

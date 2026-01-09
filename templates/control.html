@@ -328,9 +328,18 @@
             </div>
             <div class="row">
                 <div>
+                    <label for="ltWidth">Width</label>
+                    <select id="ltWidth">
+                        <option value="compact">Compact (Fit Content)</option>
+                        <option value="full">Full Screen Width</option>
+                    </select>
+                </div>
+                <div>
                     <label for="duration">Auto-hide (seconds, 0 = manual)</label>
                     <input type="number" id="duration" value="5" min="0" max="60">
                 </div>
+            </div>
+            <div class="row">
                 <div>
                     <label for="ltFont">Font</label>
                     <select id="ltFont">
@@ -344,9 +353,15 @@
                         <option value="Impact">Impact</option>
                         <option value="Comic Sans MS">Comic Sans MS</option>
                         <option value="Courier New">Courier New</option>
+                        <option value="custom">Custom Font (URL below)</option>
                     </select>
                 </div>
+                <div></div>
             </div>
+            <label for="ltCustomFontUrl">Custom Font URL (.ttf, .otf, .woff, .woff2)</label>
+            <input type="url" id="ltCustomFontUrl" placeholder="https://example.com/font.woff2">
+            <label for="ltCustomFontName">Custom Font Name</label>
+            <input type="text" id="ltCustomFontName" placeholder="My Custom Font">
         </div>
         
         <div class="control-group cyan">
@@ -672,7 +687,10 @@
             document.getElementById('position').value = state.position;
             document.getElementById('textSize').value = state.textSize;
             document.getElementById('duration').value = state.duration;
+            document.getElementById('ltWidth').value = state.width || 'compact';
             document.getElementById('ltFont').value = state.font || 'Segoe UI';
+            document.getElementById('ltCustomFontUrl').value = state.customFontUrl || '';
+            document.getElementById('ltCustomFontName').value = state.customFontName || '';
             document.getElementById('ltStyle').value = state.style || 'modern';
             document.getElementById('ltBgColor').value = state.bgColor || '#1a1a2e';
             document.getElementById('ltAccentColor').value = state.accentColor || '#00d4ff';
@@ -692,7 +710,10 @@
                     position: document.getElementById('position').value,
                     textSize: document.getElementById('textSize').value,
                     duration: parseInt(document.getElementById('duration').value),
+                    width: document.getElementById('ltWidth').value,
                     font: document.getElementById('ltFont').value,
+                    customFontUrl: document.getElementById('ltCustomFontUrl').value,
+                    customFontName: document.getElementById('ltCustomFontName').value,
                     style: document.getElementById('ltStyle').value,
                     bgColor: document.getElementById('ltBgColor').value,
                     accentColor: document.getElementById('ltAccentColor').value,

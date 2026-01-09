@@ -15,8 +15,11 @@ lower_third_state = {
     'position': 'bottom-left',
     'textSize': 'medium',
     'font': 'Segoe UI',
+    'customFontUrl': '',
+    'customFontName': '',
     'duration': 5,
     'style': 'modern',
+    'width': 'compact',
     'bgColor': '#1a1a2e',
     'accentColor': '#00d4ff',
     'textColor': '#ffffff',
@@ -276,7 +279,7 @@ def http_lt_hide():
 @app.route('/api/lowerthird/update')
 def http_lt_update():
     global lower_third_state
-    for key in ['line1', 'line2', 'position', 'textSize', 'font', 'style', 'bgColor', 'accentColor', 'textColor', 'imageUrl', 'imageShape']:
+    for key in ['line1', 'line2', 'position', 'textSize', 'font', 'customFontUrl', 'customFontName', 'style', 'width', 'bgColor', 'accentColor', 'textColor', 'imageUrl', 'imageShape']:
         if request.args.get(key):
             lower_third_state[key] = request.args.get(key)
     if request.args.get('duration'):
