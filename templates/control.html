@@ -288,8 +288,6 @@
             <input type="text" id="line1" placeholder="Enter name..." value="John Smith">
             <label for="line2">Line 2 (Title)</label>
             <input type="text" id="line2" placeholder="Enter title..." value="Software Engineer">
-            <label for="customText">Custom Text (optional - appears below title)</label>
-            <input type="text" id="customText" placeholder="Additional info, hashtag, etc...">
         </div>
         
         <div class="control-group cyan">
@@ -302,10 +300,6 @@
                 <option value="circle">Circle</option>
                 <option value="rounded">Rounded</option>
             </select>
-            <label for="ltFullWidth" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                <input type="checkbox" id="ltFullWidth" style="width: auto;">
-                Full Width (stretch across screen)
-            </label>
         </div>
         
         <div class="control-group cyan">
@@ -675,7 +669,6 @@
         socket.on('state_update', (state) => {
             document.getElementById('line1').value = state.line1;
             document.getElementById('line2').value = state.line2;
-            document.getElementById('customText').value = state.customText || '';
             document.getElementById('position').value = state.position;
             document.getElementById('textSize').value = state.textSize;
             document.getElementById('duration').value = state.duration;
@@ -686,7 +679,6 @@
             document.getElementById('ltTextColor').value = state.textColor || '#ffffff';
             document.getElementById('ltImageUrl').value = state.imageUrl || '';
             document.getElementById('ltImageShape').value = state.imageShape || 'square';
-            document.getElementById('ltFullWidth').checked = state.fullWidth || false;
             updateStatus('ltStatus', 'Lower Third', state.visible);
         });
         
@@ -697,7 +689,6 @@
                 body: JSON.stringify({
                     line1: document.getElementById('line1').value,
                     line2: document.getElementById('line2').value,
-                    customText: document.getElementById('customText').value,
                     position: document.getElementById('position').value,
                     textSize: document.getElementById('textSize').value,
                     duration: parseInt(document.getElementById('duration').value),
@@ -707,8 +698,7 @@
                     accentColor: document.getElementById('ltAccentColor').value,
                     textColor: document.getElementById('ltTextColor').value,
                     imageUrl: document.getElementById('ltImageUrl').value,
-                    imageShape: document.getElementById('ltImageShape').value,
-                    fullWidth: document.getElementById('ltFullWidth').checked
+                    imageShape: document.getElementById('ltImageShape').value
                 })
             });
         }

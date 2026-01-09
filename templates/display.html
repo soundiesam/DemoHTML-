@@ -60,33 +60,6 @@
             margin-top: 5px;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
-        .lower-third .custom-text {
-            margin-top: 8px;
-            font-size: 0.75em;
-            opacity: 0.85;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-        .lower-third.full-width {
-            left: 0 !important;
-            right: 0 !important;
-            width: 100% !important;
-            transform: translateY(100%);
-        }
-        .lower-third.full-width.visible {
-            transform: translateY(0);
-        }
-        .lower-third.full-width.pos-top-left,
-        .lower-third.full-width.pos-top-center,
-        .lower-third.full-width.pos-top-right {
-            top: 0;
-            bottom: auto;
-            transform: translateY(-100%);
-        }
-        .lower-third.full-width.pos-top-left.visible,
-        .lower-third.full-width.pos-top-center.visible,
-        .lower-third.full-width.pos-top-right.visible {
-            transform: translateY(0);
-        }
         .size-small .line1 { font-size: 20px; }
         .size-small .line2 { font-size: 16px; }
         .size-medium .line1 { font-size: 28px; }
@@ -353,7 +326,6 @@
         <div class="lt-text">
             <div class="line1">John Smith</div>
             <div class="line2">Software Engineer</div>
-            <div class="custom-text" id="ltCustomText" style="display: none;"></div>
         </div>
     </div>
     
@@ -420,21 +392,12 @@
             lt.querySelector('.line1').textContent = state.line1;
             lt.querySelector('.line2').textContent = state.line2;
             
-            const customTextEl = document.getElementById('ltCustomText');
-            if (state.customText) {
-                customTextEl.textContent = state.customText;
-                customTextEl.style.display = 'block';
-            } else {
-                customTextEl.style.display = 'none';
-            }
-            
             const bgColor = state.bgColor || '#1a1a2e';
             const accentColor = state.accentColor || '#00d4ff';
             const textColor = state.textColor || '#ffffff';
             const style = state.style || 'modern';
             const imageUrl = state.imageUrl || '';
             const imageShape = state.imageShape || 'square';
-            const fullWidth = state.fullWidth || false;
             
             lt.style.setProperty('--lt-bg', hexToRgba(bgColor, 0.9));
             lt.style.setProperty('--lt-bg-dark', darkenColor(bgColor, 30));
@@ -442,7 +405,6 @@
             
             lt.querySelector('.line1').style.color = textColor;
             lt.querySelector('.line2').style.color = accentColor;
-            customTextEl.style.color = textColor;
             
             if (imageUrl) {
                 ltImage.src = imageUrl;
@@ -456,14 +418,11 @@
             lt.classList.add('pos-' + state.position);
             lt.classList.add('size-' + state.textSize);
             lt.classList.add('style-' + style);
-            if (fullWidth) {
-                lt.classList.add('full-width');
-            }
             lt.style.fontFamily = state.font || 'Segoe UI';
             
             if (state.visible) {
                 lt.classList.add('visible');
-                if (state.position.includes('center') && !fullWidth) {
+                if (state.position.includes('center')) {
                     lt.classList.add('center');
                 }
                 if (hideTimeout) clearTimeout(hideTimeout);
