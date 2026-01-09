@@ -4,7 +4,7 @@ A Docker-ready HTML5 overlay control application for streaming/broadcasting. Pro
 
 ## Features
 
-- **Lower Third** - Name/title display with image support, 8 style presets, custom colors
+- **Lower Third** - Name/title display with image support, 8 style presets, custom colors, compact or full-width modes
 - **RSS Ticker** - Scrolling news ticker from any RSS feed
 - **Logo Bug** - Corner logo with opacity and size controls
 - **Full-Screen Title Card** - Segment transitions with background image support
@@ -12,7 +12,7 @@ A Docker-ready HTML5 overlay control application for streaming/broadcasting. Pro
 - **Breaking News Banner** - Urgent announcements with pulsing animation
 
 All elements support:
-- Font customization (11 font options)
+- Font customization (11 built-in fonts + custom font URL)
 - Position controls
 - Size options
 - Independent show/hide
@@ -55,20 +55,23 @@ Control overlays remotely via HTTP GET requests. Perfect for Stream Deck, Compan
 Query parameters for `/show` and `/update`:
 - `line1` - Name text
 - `line2` - Title text
-- `imageUrl` - Image URL
+- `imageUrl` - Image URL (logo, headshot)
 - `imageShape` - square, circle, rounded
 - `position` - bottom-left, bottom-center, bottom-right, top-left, top-center, top-right
 - `textSize` - small, medium, large, xlarge
+- `width` - compact, full
 - `style` - modern, classic, minimal, bold, news, elegant, neon, glass
 - `bgColor` - Background color (hex)
 - `accentColor` - Accent color (hex)
 - `textColor` - Text color (hex)
-- `font` - Font family name
+- `font` - Font family name (or "custom" for custom font)
+- `customFontUrl` - URL to custom font file (.ttf, .otf, .woff, .woff2)
+- `customFontName` - Name for the custom font
 - `duration` - Auto-hide seconds (0 = manual)
 
 **Example:**
 ```
-/api/lowerthird/show?line1=Jane%20Doe&line2=CEO&style=news
+/api/lowerthird/show?line1=Jane%20Doe&line2=CEO&style=news&width=full
 ```
 
 ### RSS Ticker
@@ -106,7 +109,9 @@ Query parameters for `/show` and `/update`:
 |----------|-------------|
 | `/api/all/hide` | Hide all overlay elements |
 
-## Lower Third Style Presets
+## Lower Third Options
+
+### Style Presets
 
 | Style | Description |
 |-------|-------------|
@@ -118,6 +123,39 @@ Query parameters for `/show` and `/update`:
 | Elegant | Thin border outline with blur backdrop |
 | Neon | Glowing border effect |
 | Glass | Frosted glass/transparent look |
+
+### Width Modes
+
+| Mode | Description |
+|------|-------------|
+| Compact | Fits content width, positioned based on selection |
+| Full | Spans entire screen width, slides up/down |
+
+### Custom Fonts
+
+To use a custom font:
+1. Select "Custom Font (URL below)" from the Font dropdown
+2. Enter the direct URL to a font file (.ttf, .otf, .woff, .woff2)
+3. Enter a name for the font
+4. Click Update Settings
+
+**Font hosting options:**
+- Google Fonts (download and host)
+- Font Squirrel (fontsquirrel.com)
+- DaFont (dafont.com)
+- Any direct file URL
+
+### Image Support
+
+Add a logo or headshot to the lower third:
+- Paste an image URL
+- Choose shape: Square, Circle, or Rounded
+- Image scales automatically with text size
+
+**Note:** Google Drive share links don't work directly. Convert them to:
+```
+https://drive.google.com/uc?export=view&id=YOUR_FILE_ID
+```
 
 ## Project Structure
 
