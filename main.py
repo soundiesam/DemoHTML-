@@ -12,6 +12,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 lower_third_state = {
     'line1': 'John Smith',
     'line2': 'Software Engineer',
+    'customText': '',
     'position': 'bottom-left',
     'textSize': 'medium',
     'font': 'Segoe UI',
@@ -22,6 +23,7 @@ lower_third_state = {
     'textColor': '#ffffff',
     'imageUrl': '',
     'imageShape': 'square',
+    'fullWidth': False,
     'visible': False
 }
 
@@ -276,11 +278,13 @@ def http_lt_hide():
 @app.route('/api/lowerthird/update')
 def http_lt_update():
     global lower_third_state
-    for key in ['line1', 'line2', 'position', 'textSize', 'font', 'style', 'bgColor', 'accentColor', 'textColor', 'imageUrl', 'imageShape']:
+    for key in ['line1', 'line2', 'customText', 'position', 'textSize', 'font', 'style', 'bgColor', 'accentColor', 'textColor', 'imageUrl', 'imageShape']:
         if request.args.get(key):
             lower_third_state[key] = request.args.get(key)
     if request.args.get('duration'):
         lower_third_state['duration'] = int(request.args.get('duration'))
+    if request.args.get('fullWidth'):
+        lower_third_state['fullWidth'] = request.args.get('fullWidth').lower() == 'true'
     socketio.emit('state_update', lower_third_state)
     return jsonify({'status': 'ok', 'state': lower_third_state})
 
