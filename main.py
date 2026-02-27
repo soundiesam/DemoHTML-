@@ -103,7 +103,7 @@ def fetch_rss_feed(url):
 
 @app.route('/')
 def control():
-    port = int(os.environ.get('PORT', 3000))
+    port = int(os.environ.get('PORT', 5000))
     return render_template('control.html', port=port)
 
 @app.route('/display')
@@ -417,7 +417,7 @@ def set_multiview():
 
 @app.route('/api/config', methods=['GET'])
 def get_config():
-    port = int(os.environ.get('PORT', 3000))
+    port = int(os.environ.get('PORT', 5000))
     return jsonify({'port': port})
 
 @app.route('/api/config/port', methods=['GET'])
@@ -454,5 +454,5 @@ if __name__ == '__main__':
                 config_port = config.get('port')
         except:
             pass
-    port = int(os.environ.get('PORT', config_port or 3000))
+    port = int(os.environ.get('PORT', config_port or 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
