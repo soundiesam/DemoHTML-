@@ -103,7 +103,8 @@ def fetch_rss_feed(url):
 
 @app.route('/')
 def control():
-    return render_template('control.html')
+    port = int(os.environ.get('PORT', 5000))
+    return render_template('control.html', port=port)
 
 @app.route('/display')
 def display():
@@ -400,6 +401,44 @@ def http_hide_all():
     socketio.emit('breaking_update', breaking_news_state)
     return jsonify({'status': 'ok', 'message': 'All elements hidden'})
 
-if __name__ == '__main__':
+@app.route('/api/config', methods=['GET'])
+def get_config():
     port = int(os.environ.get('PORT', 5000))
+    return jsonify({'port': port})
+
+@app.route('/api/config/port', methods=['GET'])
+def set_port():
+    new_port = request.args.get('port')
+    if not new_port:
+        return jsonify({'error': 'No port specified'}), 400
+    try:
+        port_num = int(new_port)
+        if port_num < 1 or port_num > 65535:
+            return jsonify({'error': 'Port must be between 1 and 65535'}), 400
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
+        config = {}
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                import json
+                config = json.load(f)
+        config['port'] = port_num
+        with open(config_path, 'w') as f:
+            import json
+            json.dump(config, f, indent=2)
+        return jsonify({'status': 'ok', 'port': port_num, 'message': 'Port saved. Restart the app for changes to take effect.'})
+    except ValueError:
+        return jsonify({'error': 'Invalid port number'}), 400
+
+if __name__ == '__main__':
+    import json
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
+    config_port = None
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+                config_port = config.get('port')
+        except:
+            pass
+    port = int(os.environ.get('PORT', config_port or 5000))
     socketio.run(app, host='0.0.0.0', port=port, debug=True, allow_unsafe_werkzeug=True)
