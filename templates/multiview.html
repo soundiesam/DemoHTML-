@@ -33,39 +33,18 @@
         }
         .quadrant-label {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 8px;
+            left: 8px;
             z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 10px;
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
-            font-size: 13px;
-            transition: opacity 0.3s ease;
-        }
-        .quadrant:hover .quadrant-label {
-            opacity: 1;
-        }
-        .quadrant-label span {
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #00d4ff;
-        }
-        .quadrant-label select {
-            background: #222;
-            color: #fff;
-            border: 1px solid #444;
-            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .quadrant-label select:hover {
-            border-color: #00d4ff;
+            pointer-events: none;
         }
         .quadrant iframe {
             width: 100%;
@@ -77,82 +56,38 @@
         .quadrant.border-tr { border-top: 2px solid #ff6b6b; border-right: 2px solid #ff6b6b; }
         .quadrant.border-bl { border-bottom: 2px solid #4ecdc4; border-left: 2px solid #4ecdc4; }
         .quadrant.border-br { border-bottom: 2px solid #ffd93d; border-right: 2px solid #ffd93d; }
-        .quadrant.border-tl .quadrant-label span { color: #00d4ff; }
-        .quadrant.border-tr .quadrant-label span { color: #ff6b6b; }
-        .quadrant.border-bl .quadrant-label span { color: #4ecdc4; }
-        .quadrant.border-br .quadrant-label span { color: #ffd93d; }
+        .quadrant.border-tl .quadrant-label { color: #00d4ff; }
+        .quadrant.border-tr .quadrant-label { color: #ff6b6b; }
+        .quadrant.border-bl .quadrant-label { color: #4ecdc4; }
+        .quadrant.border-br .quadrant-label { color: #ffd93d; }
     </style>
 </head>
 <body>
     <div class="grid">
         <div class="quadrant border-tl">
-            <div class="quadrant-label">
-                <span>Q1</span>
-                <select id="select-q1" onchange="updateQuadrant('q1', this.value)">
-                    <option value="all">All Elements</option>
-                    <option value="lowerthird">Lower Third</option>
-                    <option value="ticker">RSS Ticker</option>
-                    <option value="logo">Logo Bug</option>
-                    <option value="titlecard">Title Card</option>
-                    <option value="social">Social Bar</option>
-                    <option value="breaking">Breaking News</option>
-                    <option value="none">None (Black)</option>
-                </select>
-            </div>
+            <div class="quadrant-label">Q1</div>
             <iframe id="frame-q1" src="/display"></iframe>
         </div>
         <div class="quadrant border-tr">
-            <div class="quadrant-label">
-                <span>Q2</span>
-                <select id="select-q2" onchange="updateQuadrant('q2', this.value)">
-                    <option value="all">All Elements</option>
-                    <option value="lowerthird">Lower Third</option>
-                    <option value="ticker">RSS Ticker</option>
-                    <option value="logo">Logo Bug</option>
-                    <option value="titlecard">Title Card</option>
-                    <option value="social">Social Bar</option>
-                    <option value="breaking">Breaking News</option>
-                    <option value="none">None (Black)</option>
-                </select>
-            </div>
+            <div class="quadrant-label">Q2</div>
             <iframe id="frame-q2" src="/display"></iframe>
         </div>
         <div class="quadrant border-bl">
-            <div class="quadrant-label">
-                <span>Q3</span>
-                <select id="select-q3" onchange="updateQuadrant('q3', this.value)">
-                    <option value="all">All Elements</option>
-                    <option value="lowerthird">Lower Third</option>
-                    <option value="ticker">RSS Ticker</option>
-                    <option value="logo">Logo Bug</option>
-                    <option value="titlecard">Title Card</option>
-                    <option value="social">Social Bar</option>
-                    <option value="breaking">Breaking News</option>
-                    <option value="none">None (Black)</option>
-                </select>
-            </div>
+            <div class="quadrant-label">Q3</div>
             <iframe id="frame-q3" src="/display"></iframe>
         </div>
         <div class="quadrant border-br">
-            <div class="quadrant-label">
-                <span>Q4</span>
-                <select id="select-q4" onchange="updateQuadrant('q4', this.value)">
-                    <option value="all">All Elements</option>
-                    <option value="lowerthird">Lower Third</option>
-                    <option value="ticker">RSS Ticker</option>
-                    <option value="logo">Logo Bug</option>
-                    <option value="titlecard">Title Card</option>
-                    <option value="social">Social Bar</option>
-                    <option value="breaking">Breaking News</option>
-                    <option value="none">None (Black)</option>
-                </select>
-            </div>
+            <div class="quadrant-label">Q4</div>
             <iframe id="frame-q4" src="/display"></iframe>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-        function updateQuadrant(id, value) {
+        const socket = io();
+        let currentState = { q1: 'all', q2: 'all', q3: 'all', q4: 'all' };
+
+        function applyQuadrant(id, value) {
             const frame = document.getElementById('frame-' + id);
             if (value === 'none') {
                 frame.src = 'about:blank';
@@ -161,15 +96,14 @@
             } else {
                 frame.src = '/display?filter=' + value;
             }
-            localStorage.setItem('multiview-' + id, value);
         }
 
-        window.addEventListener('load', function() {
-            ['q1', 'q2', 'q3', 'q4'].forEach(function(id) {
-                const saved = localStorage.getItem('multiview-' + id);
-                if (saved) {
-                    document.getElementById('select-' + id).value = saved;
-                    updateQuadrant(id, saved);
+        socket.on('multiview_update', (state) => {
+            ['q1', 'q2', 'q3', 'q4'].forEach((id) => {
+                const newVal = state[id] || 'all';
+                if (newVal !== currentState[id]) {
+                    currentState[id] = newVal;
+                    applyQuadrant(id, newVal);
                 }
             });
         });

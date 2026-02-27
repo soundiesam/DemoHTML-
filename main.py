@@ -75,6 +75,13 @@ breaking_news_state = {
     'visible': False
 }
 
+multiview_state = {
+    'q1': 'all',
+    'q2': 'all',
+    'q3': 'all',
+    'q4': 'all'
+}
+
 def strip_html(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
@@ -185,6 +192,7 @@ def handle_connect():
     emit('titlecard_update', title_card_state)
     emit('social_update', social_bar_state)
     emit('breaking_update', breaking_news_state)
+    emit('multiview_update', multiview_state)
 
 @socketio.on('show')
 def handle_show():
@@ -257,6 +265,12 @@ def handle_breaking_hide():
     global breaking_news_state
     breaking_news_state['visible'] = False
     emit('breaking_update', breaking_news_state, broadcast=True)
+
+@socketio.on('multiview_set')
+def handle_multiview_set(data):
+    global multiview_state
+    multiview_state.update(data)
+    emit('multiview_update', multiview_state, broadcast=True)
 
 # HTTP GET endpoints for remote control
 @app.route('/api/lowerthird/show')
