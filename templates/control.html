@@ -1157,9 +1157,7 @@
         });
         
         function updateMultiviewQuadrant(quadrant, value) {
-            const data = {};
-            data[quadrant] = value;
-            socket.emit('multiview_set', data);
+            fetch('/api/multiview/set?' + quadrant + '=' + value);
         }
         
         // Settings

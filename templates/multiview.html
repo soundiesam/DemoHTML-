@@ -78,9 +78,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-        const socket = io();
         let currentState = { q1: 'all', q2: 'all', q3: 'all', q4: 'all' };
 
         function applyQuadrant(id, value) {
@@ -94,15 +92,23 @@
             }
         }
 
-        socket.on('multiview_update', (state) => {
-            ['q1', 'q2', 'q3', 'q4'].forEach((id) => {
-                const newVal = state[id] || 'all';
-                if (newVal !== currentState[id]) {
-                    currentState[id] = newVal;
-                    applyQuadrant(id, newVal);
-                }
-            });
-        });
+        function checkForUpdates() {
+            fetch('/api/multiview')
+                .then(r => r.json())
+                .then(state => {
+                    ['q1', 'q2', 'q3', 'q4'].forEach((id) => {
+                        const newVal = state[id] || 'all';
+                        if (newVal !== currentState[id]) {
+                            currentState[id] = newVal;
+                            applyQuadrant(id, newVal);
+                        }
+                    });
+                })
+                .catch(() => {});
+        }
+
+        checkForUpdates();
+        setInterval(checkForUpdates, 1000);
     </script>
 </body>
 </html>

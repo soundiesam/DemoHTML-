@@ -401,6 +401,20 @@ def http_hide_all():
     socketio.emit('breaking_update', breaking_news_state)
     return jsonify({'status': 'ok', 'message': 'All elements hidden'})
 
+@app.route('/api/multiview', methods=['GET'])
+def get_multiview():
+    return jsonify(multiview_state)
+
+@app.route('/api/multiview/set', methods=['GET'])
+def set_multiview():
+    global multiview_state
+    for q in ['q1', 'q2', 'q3', 'q4']:
+        val = request.args.get(q)
+        if val:
+            multiview_state[q] = val
+    socketio.emit('multiview_update', multiview_state)
+    return jsonify({'status': 'ok', 'state': multiview_state})
+
 @app.route('/api/config', methods=['GET'])
 def get_config():
     port = int(os.environ.get('PORT', 5000))
