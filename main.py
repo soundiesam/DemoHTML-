@@ -102,6 +102,10 @@ def control():
 def display():
     return render_template('display.html')
 
+@app.route('/multiview')
+def multiview():
+    return render_template('multiview.html')
+
 @app.route('/api/state', methods=['GET'])
 def get_state():
     return jsonify(lower_third_state)

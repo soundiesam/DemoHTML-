@@ -397,6 +397,21 @@
         const breakingNews = document.getElementById('breakingNews');
         let hideTimeout = null;
         
+        const urlParams = new URLSearchParams(window.location.search);
+        const filterElement = urlParams.get('filter');
+        
+        function isAllowed(element) {
+            if (!filterElement) return true;
+            return filterElement === element;
+        }
+        
+        if (filterElement) {
+            const allElements = { 'lowerthird': lt, 'ticker': ticker, 'logo': logoBug, 'titlecard': titleCard, 'social': socialBar, 'breaking': breakingNews };
+            for (const [name, el] of Object.entries(allElements)) {
+                if (name !== filterElement) el.style.display = 'none';
+            }
+        }
+        
         socket.on('connect', () => console.log('Display connected'));
         
         // Lower Third

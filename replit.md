@@ -1,25 +1,33 @@
 # Overlay Control App
 
 ## Overview
-An HTML5 application for creating and controlling streaming overlays (Lower Thirds and RSS Ticker), designed for broadcasting use. Can run on localhost with configurable port and is ready for Docker deployment.
+An HTML5 application for creating and controlling streaming overlays, designed for broadcasting use. Can run on localhost with configurable port and is ready for Docker deployment.
 
-## Features
+## Pages
 - **Control Page** (`/`): Web interface to manage overlay elements
 - **Display Page** (`/display`): Transparent background overlay for OBS/streaming software
+- **Multiview Page** (`/multiview`): 2x2 grid display with selectable elements per quadrant
+
+## Features
 
 ### Lower Third Controls
 - Two lines of text (name + title)
+- Image support (logo/headshot) with square, circle, rounded shapes
 - Position options: bottom-left, bottom-center, bottom-right, top-left, top-center, top-right
+- Width modes: compact (fit content) or full (screen width)
 - Text sizes: small, medium, large, extra large
+- 8 style presets: modern, classic, minimal, bold, news, elegant, neon, glass
+- Custom colors: background, accent, text
+- 11 built-in fonts + custom font URL support
 - Auto-hide duration (0 = manual control)
-- Show/Hide buttons for manual triggering
+- Show/Hide buttons
 
 ### RSS Ticker Controls
 - RSS feed URL input with load button
 - Position options: top, bottom
 - Text sizes: small, medium, large
 - Speed control: slow, medium, fast
-- Show/Hide buttons for manual triggering
+- Show/Hide buttons
 - Scrolling ticker animation with feed headlines
 
 ### Logo Bug
@@ -31,9 +39,10 @@ An HTML5 application for creating and controlling streaming overlays (Lower Thir
 
 ### Full-Screen Title Card
 - Title and subtitle text fields
-- Background color picker
+- Background color picker and background image URL
 - Text color picker
-- Show/Hide buttons for segment transitions
+- Font selection
+- Show/Hide buttons
 
 ### Social Media Bar
 - Fields for Twitter/X, YouTube, Instagram, TikTok, Facebook, Website
@@ -44,7 +53,17 @@ An HTML5 application for creating and controlling streaming overlays (Lower Thir
 ### Breaking News Banner
 - Custom text input
 - Urgent red styling with pulsing animation
-- Show/Hide buttons for breaking announcements
+- Show/Hide buttons
+
+### Multiview Display
+- 2x2 grid layout with 4 quadrants
+- Each quadrant has a dropdown to select which element to display
+- Options: All Elements, Lower Third, RSS Ticker, Logo Bug, Title Card, Social Bar, Breaking News, None
+- Selections persist via localStorage
+- Color-coded borders for each quadrant
+
+## HTTP API (GET Requests)
+All elements can be controlled via HTTP GET requests for integration with Stream Deck, Companion, Touch Portal, or automation scripts. Endpoints include `/api/lowerthird/show`, `/api/lowerthird/hide`, `/api/ticker/show`, etc. See README.md for full API reference.
 
 ## Project Structure
 ```
@@ -52,8 +71,11 @@ An HTML5 application for creating and controlling streaming overlays (Lower Thir
 ├── main.py              # Flask server with SocketIO
 ├── templates/
 │   ├── control.html     # Control panel interface
-│   └── display.html     # Transparent display overlay
-├── pyproject.toml       # Python dependencies
+│   ├── display.html     # Transparent display overlay
+│   └── multiview.html   # 2x2 grid multiview display
+├── Dockerfile           # Docker configuration
+├── requirements.txt     # Python dependencies
+├── README.md            # Full documentation
 └── replit.md            # This file
 ```
 
@@ -63,24 +85,9 @@ Default port is 5000. To change the port, set the `PORT` environment variable:
 PORT=8080 python main.py
 ```
 
-## Docker Deployment
-To run in Docker:
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY . .
-RUN pip install flask flask-socketio
-EXPOSE 5000
-CMD ["python", "main.py"]
-```
-
-## Usage
-1. Open the control page at `http://localhost:5000/`
-2. Open the display page at `http://localhost:5000/display` in OBS as a browser source
-3. Configure the Lower Third text, position, and size
-4. Click "Show Lower Third" to display it
-
 ## Technical Notes
 - Uses Flask with Flask-SocketIO for real-time updates
 - WebSocket communication between control and display pages
 - Display page has transparent background for overlay use
+- Display page supports `?filter=` query param to show only one element type
+- Multiview uses iframes with filter params for per-quadrant element selection
