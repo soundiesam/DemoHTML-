@@ -417,21 +417,28 @@
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <h2>App Settings</h2>
+            
             <label for="settingsPort">Port Number</label>
-            <input type="number" id="settingsPort" value="{{ port }}" min="1" max="65535" placeholder="5000">
+            <input type="number" id="settingsPort" value="{{ port }}" min="1" max="65535" placeholder="5000" oninput="updateUrls()">
             
             <div class="url-list">
-                <p><strong>App URLs (using current port):</strong></p>
+                <p><strong>App URLs:</strong></p>
                 <p>Control Panel: <code id="urlControl">http://localhost:{{ port }}/</code></p>
                 <p>Display (OBS): <code id="urlDisplay">http://localhost:{{ port }}/display</code></p>
                 <p>Multiview: <code id="urlMultiview">http://localhost:{{ port }}/multiview</code></p>
+            </div>
+            
+            <div class="url-list" style="margin-top: 10px;">
+                <p><strong>Docker Run Command:</strong></p>
+                <p><code id="dockerCmd" style="word-break: break-all;">docker run -p {{ port }}:5000 overlay-app</code></p>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">In Docker, change the first number to set your port. The app always listens on 5000 internally.</p>
             </div>
             
             <div id="saveMsg" class="save-msg"></div>
             
             <div class="btn-row">
                 <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
-                <button class="btn-save" onclick="savePort()">Save & Restart Required</button>
+                <button class="btn-save" onclick="savePort()">Save Port (Restart Required)</button>
             </div>
         </div>
     </div>
@@ -1166,6 +1173,14 @@
             document.getElementById('settingsModal').classList.remove('active');
         }
         
+        function updateUrls() {
+            const port = document.getElementById('settingsPort').value || '5000';
+            document.getElementById('urlControl').textContent = 'http://localhost:' + port + '/';
+            document.getElementById('urlDisplay').textContent = 'http://localhost:' + port + '/display';
+            document.getElementById('urlMultiview').textContent = 'http://localhost:' + port + '/multiview';
+            document.getElementById('dockerCmd').textContent = 'docker run -p ' + port + ':5000 overlay-app';
+        }
+        
         function savePort() {
             const port = document.getElementById('settingsPort').value;
             const msg = document.getElementById('saveMsg');
@@ -1174,10 +1189,7 @@
                 .then(data => {
                     if (data.status === 'ok') {
                         msg.className = 'save-msg success';
-                        msg.textContent = 'Port saved to ' + data.port + '. Restart the app for changes to take effect.';
-                        document.getElementById('urlControl').textContent = 'http://localhost:' + data.port + '/';
-                        document.getElementById('urlDisplay').textContent = 'http://localhost:' + data.port + '/display';
-                        document.getElementById('urlMultiview').textContent = 'http://localhost:' + data.port + '/multiview';
+                        msg.textContent = 'Port saved to ' + data.port + '. When running locally, restart the app. In Docker, use: docker run -p ' + data.port + ':5000 overlay-app';
                     } else {
                         msg.className = 'save-msg error';
                         msg.textContent = data.error || 'Failed to save port.';
