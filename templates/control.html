@@ -446,6 +446,69 @@
     <div class="container">
         <h1>Overlay Control Panel</h1>
         
+        <!-- MULTIVIEW -->
+        <h2 class="section-title" style="border-color: #a855f7;">Multiview Layout</h2>
+        
+        <div class="control-group" style="border-color: #a855f7;">
+            <h2>Quadrant Assignments</h2>
+            <div class="row">
+                <div>
+                    <label for="mvQ1" style="color: #00d4ff;">Q1 (Top Left)</label>
+                    <select id="mvQ1" onchange="updateMultiviewQuadrant('q1', this.value)">
+                        <option value="all">All Elements</option>
+                        <option value="lowerthird">Lower Third</option>
+                        <option value="ticker">RSS Ticker</option>
+                        <option value="logo">Logo Bug</option>
+                        <option value="titlecard">Title Card</option>
+                        <option value="social">Social Bar</option>
+                        <option value="breaking">Breaking News</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="mvQ2" style="color: #ff6b6b;">Q2 (Top Right)</label>
+                    <select id="mvQ2" onchange="updateMultiviewQuadrant('q2', this.value)">
+                        <option value="all">All Elements</option>
+                        <option value="lowerthird">Lower Third</option>
+                        <option value="ticker">RSS Ticker</option>
+                        <option value="logo">Logo Bug</option>
+                        <option value="titlecard">Title Card</option>
+                        <option value="social">Social Bar</option>
+                        <option value="breaking">Breaking News</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="mvQ3" style="color: #4ecdc4;">Q3 (Bottom Left)</label>
+                    <select id="mvQ3" onchange="updateMultiviewQuadrant('q3', this.value)">
+                        <option value="all">All Elements</option>
+                        <option value="lowerthird">Lower Third</option>
+                        <option value="ticker">RSS Ticker</option>
+                        <option value="logo">Logo Bug</option>
+                        <option value="titlecard">Title Card</option>
+                        <option value="social">Social Bar</option>
+                        <option value="breaking">Breaking News</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="mvQ4" style="color: #ffd93d;">Q4 (Bottom Right)</label>
+                    <select id="mvQ4" onchange="updateMultiviewQuadrant('q4', this.value)">
+                        <option value="all">All Elements</option>
+                        <option value="lowerthird">Lower Third</option>
+                        <option value="ticker">RSS Ticker</option>
+                        <option value="logo">Logo Bug</option>
+                        <option value="titlecard">Title Card</option>
+                        <option value="social">Social Bar</option>
+                        <option value="breaking">Breaking News</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
         <!-- LOWER THIRD -->
         <h2 class="section-title cyan">Lower Third</h2>
         
@@ -835,69 +898,6 @@
             <button class="btn-hide" onclick="hideBreaking()">Hide</button>
         </div>
         <div id="breakingStatus" class="status hidden">Breaking News: Hidden</div>
-        
-        <!-- MULTIVIEW -->
-        <h2 class="section-title" style="border-color: #a855f7;">Multiview Layout</h2>
-        
-        <div class="control-group" style="border-color: #a855f7;">
-            <h2>Quadrant Assignments</h2>
-            <div class="row">
-                <div>
-                    <label for="mvQ1" style="color: #00d4ff;">Q1 (Top Left)</label>
-                    <select id="mvQ1" onchange="updateMultiviewQuadrant('q1', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="mvQ2" style="color: #ff6b6b;">Q2 (Top Right)</label>
-                    <select id="mvQ2" onchange="updateMultiviewQuadrant('q2', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <label for="mvQ3" style="color: #4ecdc4;">Q3 (Bottom Left)</label>
-                    <select id="mvQ3" onchange="updateMultiviewQuadrant('q3', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="mvQ4" style="color: #ffd93d;">Q4 (Bottom Right)</label>
-                    <select id="mvQ4" onchange="updateMultiviewQuadrant('q4', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-            </div>
-        </div>
         
         <div class="display-link">
             <a href="/display" target="_blank">Open Display Window (for OBS/streaming)</a>
