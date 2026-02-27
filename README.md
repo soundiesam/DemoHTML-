@@ -10,6 +10,7 @@ A Docker-ready HTML5 overlay control application for streaming/broadcasting. Pro
 - **Full-Screen Title Card** - Segment transitions with background image support
 - **Social Media Bar** - Display social handles with platform icons
 - **Breaking News Banner** - Urgent announcements with pulsing animation
+- **Multiview Display** - 2x2 grid with per-quadrant element selection
 
 All elements support:
 - Font customization (11 built-in fonts + custom font URL)
@@ -17,16 +18,26 @@ All elements support:
 - Size options
 - Independent show/hide
 
+## Pages
+
+| Page | URL | Description |
+|------|-----|-------------|
+| Control Panel | `/` | Web interface to manage all overlay elements |
+| Display | `/display` | Transparent overlay for OBS browser source |
+| Multiview | `/multiview` | 2x2 grid showing selected elements per quadrant |
+
 ## Quick Start
 
 ### Run Locally
 ```bash
+pip install -r requirements.txt
 python main.py
 ```
 Default port is 5000. To change:
 ```bash
 PORT=8080 python main.py
 ```
+You can also change the port from the Settings button in the control panel.
 
 ### Docker
 ```bash
@@ -34,12 +45,36 @@ docker build -t overlay-app .
 docker run -p 5000:5000 overlay-app
 ```
 
+To use a different port in Docker, set both the port mapping and the `PORT` environment variable:
+```bash
+docker run -p 8080:8080 -e PORT=8080 overlay-app
+```
+
+In Docker Desktop, you can set the `PORT` environment variable in the container's Optional Settings.
+
 ## Usage
 
 1. Open the **Control Panel**: `http://localhost:5000/`
 2. Open the **Display Page**: `http://localhost:5000/display`
 3. In OBS, add a Browser Source pointing to the display URL
 4. Use the control panel to show/hide overlay elements
+5. Open the **Multiview**: `http://localhost:5000/multiview` for a 2x2 grid view
+
+## Multiview Display
+
+The multiview page splits the screen into a 2x2 grid with 4 quadrants. Each quadrant can display a different overlay element, controlled from the top of the control panel.
+
+Options per quadrant:
+- All Elements (shows everything)
+- Lower Third
+- RSS Ticker
+- Logo Bug
+- Title Card
+- Social Bar
+- Breaking News
+- None (blank)
+
+The multiview page has a transparent background for use as an OBS overlay.
 
 ## HTTP API (GET Requests)
 
@@ -104,10 +139,22 @@ Query parameters for `/show` and `/update`:
 | `/api/breaking/show` | Show breaking news (optional: `?text=...`) |
 | `/api/breaking/hide` | Hide breaking news |
 
+### Multiview
+| Endpoint | Description |
+|----------|-------------|
+| `/api/multiview` | Get current quadrant assignments |
+| `/api/multiview/set` | Set quadrant assignments (e.g., `?q1=lowerthird&q2=ticker`) |
+
 ### Global Controls
 | Endpoint | Description |
 |----------|-------------|
 | `/api/all/hide` | Hide all overlay elements |
+
+### Configuration
+| Endpoint | Description |
+|----------|-------------|
+| `/api/config` | Get current config (port) |
+| `/api/config/port` | Set port (e.g., `?port=8080`) - requires restart |
 
 ## Lower Third Options
 
@@ -164,9 +211,11 @@ https://drive.google.com/uc?export=view&id=YOUR_FILE_ID
 ├── main.py              # Flask server with SocketIO
 ├── templates/
 │   ├── control.html     # Control panel interface
-│   └── display.html     # Transparent display overlay
+│   ├── display.html     # Transparent display overlay
+│   └── multiview.html   # 2x2 grid multiview display
 ├── Dockerfile           # Docker configuration
 ├── requirements.txt     # Python dependencies
+├── config.json          # Port configuration (auto-generated)
 └── README.md            # This file
 ```
 
@@ -184,3 +233,5 @@ https://drive.google.com/uc?export=view&id=YOUR_FILE_ID
 3. Set width/height to match your canvas (e.g., 1920x1080)
 4. Check "Shutdown source when not visible" (optional)
 5. The display has a transparent background - overlays will appear over your content
+
+For multiview, use `http://localhost:5000/multiview` as the browser source URL instead.
