@@ -7,7 +7,7 @@ import re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'lower-third-secret'
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='gevent')
 
 lower_third_state = {
     'line1': 'John Smith',
