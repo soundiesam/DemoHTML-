@@ -401,6 +401,17 @@ def http_hide_all():
     socketio.emit('breaking_update', breaking_news_state)
     return jsonify({'status': 'ok', 'message': 'All elements hidden'})
 
+@app.route('/api/all_states', methods=['GET'])
+def get_all_states():
+    return jsonify({
+        'lowerthird': lower_third_state,
+        'ticker': ticker_state,
+        'logo': logo_state,
+        'titlecard': title_card_state,
+        'social': social_bar_state,
+        'breaking': breaking_news_state
+    })
+
 @app.route('/api/multiview', methods=['GET'])
 def get_multiview():
     return jsonify(multiview_state)
