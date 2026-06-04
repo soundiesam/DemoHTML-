@@ -1118,10 +1118,16 @@
     </div><!-- /main -->
 </div><!-- /app -->
 
-<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
 <script>
-    // ── Socket.IO (optional enhancement; HTTP polling in display.html is primary) ──
-    const socket = io({ transports: ['websocket', 'polling'] });
+    // ── Socket.IO ───────────────────────────────────────────────────
+    let socket;
+    try {
+        socket = io({ transports: ['websocket', 'polling'] });
+    } catch(e) {
+        console.warn('Socket.IO unavailable, falling back to no-op socket:', e);
+        socket = { on: () => {}, emit: () => {} };
+    }
     socket.on('connect', () => console.log('Connected to server'));
 
     // ── Sidebar navigation ──────────────────────────────────────────
