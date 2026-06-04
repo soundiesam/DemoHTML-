@@ -5,1210 +5,1468 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overlay Control Panel</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e2e8f0;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #fff;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+
+        /* ── App shell ──────────────────────────────────────────── */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100dvh;
+            overflow: hidden;
         }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #00d4ff;
+
+        /* ── Header ─────────────────────────────────────────────── */
+        #header {
+            flex: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
+            z-index: 10;
         }
-        .section-title {
-            text-align: center;
-            margin: 40px 0 20px;
-            font-size: 1.5rem;
-            border-bottom: 2px solid;
-            padding-bottom: 10px;
-        }
-        .section-title.cyan { color: #00d4ff; border-color: #00d4ff; }
-        .section-title.orange { color: #ff9f43; border-color: #ff9f43; }
-        .section-title.purple { color: #a855f7; border-color: #a855f7; }
-        .section-title.green { color: #22c55e; border-color: #22c55e; }
-        .section-title.pink { color: #ec4899; border-color: #ec4899; }
-        .section-title.red { color: #ef4444; border-color: #ef4444; }
-        .control-group {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .control-group h2 {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        .control-group.cyan h2 { color: #00d4ff; }
-        .control-group.orange h2 { color: #ff9f43; }
-        .control-group.purple h2 { color: #a855f7; }
-        .control-group.green h2 { color: #22c55e; }
-        .control-group.pink h2 { color: #ec4899; }
-        .control-group.red h2 { color: #ef4444; }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        input[type="text"], input[type="url"], input[type="color"], select, input[type="number"], input[type="range"] {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
+        #header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 1rem;
-            margin-bottom: 15px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.01em;
         }
+        #header-icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 0 12px rgba(6,182,212,0.35);
+            flex: none;
+        }
+        #settings-btn {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #94a3b8;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        #settings-btn:hover { background: rgba(255,255,255,0.13); color: #fff; }
+
+        /* ── Command Strip ───────────────────────────────────────── */
+        #command-strip {
+            flex: none;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 8px 12px;
+            overflow-x: auto;
+        }
+        .cs-row {
+            display: flex;
+            gap: 6px;
+            min-width: max-content;
+        }
+        .cs-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 100px;
+        }
+        .cs-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .cs-label svg { width: 11px; height: 11px; flex: none; }
+        .cs-btns {
+            display: flex;
+            gap: 3px;
+            width: 100%;
+        }
+        .cs-show, .cs-hide {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 4px 2px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .cs-show svg, .cs-hide svg { width: 10px; height: 10px; flex: none; }
+        .cs-show:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .cs-hide:hover { background: rgba(239,68,68,0.2); color: #fca5a5; border-color: rgba(239,68,68,0.3); }
+        .cs-show.on { background: var(--section-color); border-color: var(--section-color); color: #fff; box-shadow: 0 0 8px rgba(0,0,0,0.3); }
+        .cs-hide.off { background: rgba(239,68,68,0.7); border-color: #ef4444; color: #fff; }
+
+        /* ── Main body: sidebar + content ───────────────────────── */
+        #main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────────────── */
+        #sidebar {
+            width: 200px;
+            flex: none;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        #sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 8px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            color: #64748b;
+            position: relative;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #cbd5e1; }
+        .nav-item.active {
+            background: rgba(255,255,255,0.09);
+            color: #fff;
+            font-weight: 600;
+        }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 3px; height: 20px;
+            border-radius: 0 3px 3px 0;
+            background: var(--section-color);
+        }
+        .nav-icon {
+            flex: none;
+            width: 16px; height: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav-icon svg { width: 14px; height: 14px; }
+        .nav-item.active .nav-icon svg { color: var(--section-color); }
+        .nav-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .nav-right { display: flex; align-items: center; gap: 5px; flex: none; }
+        .status-badge {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .status-badge.on  { background: rgba(16,185,129,0.2); color: #34d399; }
+        .status-badge.off { background: rgba(239,68,68,0.2); color: #f87171; }
+        .nav-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--section-color);
+            opacity: 0.35;
+            flex: none;
+        }
+        .nav-item.active .nav-dot { opacity: 1; box-shadow: 0 0 6px var(--section-color); }
+
+        /* Sidebar footer: Update button */
+        #sidebar-footer {
+            flex: none;
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            background: rgba(0,0,0,0.15);
+        }
+        #update-btn {
+            width: 100%;
+            padding: 9px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 7px;
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 2px 10px rgba(16,185,129,0.25);
+        }
+        #update-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        #update-btn:active { transform: translateY(0); }
+
+        /* ── Content area ────────────────────────────────────────── */
+        #content {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.015);
+        }
+        .panel { display: none; padding: 20px 24px 24px; }
+        .panel.active { display: block; }
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .panel-title h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .panel-title svg { width: 22px; height: 22px; }
+        .panel-desc { color: #64748b; font-size: 0.82rem; margin-bottom: 18px; }
+
+        /* ── Form card ───────────────────────────────────────────── */
+        .form-card {
+            background: rgba(0,0,0,0.22);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+        }
+        .form-card-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #475569;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 16px;
+        }
+        .form-grid.single { grid-template-columns: 1fr; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: #94a3b8;
+        }
+
+        /* ── Form inputs ─────────────────────────────────────────── */
+        input[type="text"], input[type="url"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 7px 10px;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #06b6d4;
+        }
+        input::placeholder { color: rgba(255,255,255,0.3); }
+        select { cursor: pointer; }
+        select option { background: #1a1a2e; color: #fff; }
         input[type="color"] {
-            height: 50px;
+            padding: 2px 4px;
+            height: 34px;
             cursor: pointer;
         }
         input[type="range"] {
-            padding: 5px;
+            padding: 4px 0;
+            accent-color: #a855f7;
         }
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        select {
-            cursor: pointer;
-        }
-        select option {
-            background: #1a1a2e;
-            color: #fff;
-        }
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        button {
-            flex: 1;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-show {
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-            color: #000;
-        }
-        .btn-show:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
-        }
-        .btn-hide {
-            background: linear-gradient(135deg, #ff4757 0%, #cc0000 100%);
-            color: #fff;
-        }
-        .btn-hide:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 71, 87, 0.4);
-        }
-        .btn-update {
-            background: linear-gradient(135deg, #2ed573 0%, #1e9c50 100%);
-            color: #000;
-        }
-        .btn-update:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(46, 213, 115, 0.4);
-        }
-        .btn-refresh {
-            background: linear-gradient(135deg, #ff9f43 0%, #cc7a00 100%);
-            color: #000;
-        }
-        .btn-refresh:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 159, 67, 0.4);
-        }
-        .status {
-            text-align: center;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-weight: 600;
-        }
-        .status.visible {
-            background: rgba(46, 213, 115, 0.2);
-            border: 2px solid #2ed573;
-        }
-        .status.hidden {
-            background: rgba(255, 71, 87, 0.2);
-            border: 2px solid #ff4757;
-        }
-        .preview-box {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            padding: 40px;
-            margin-top: 20px;
-            position: relative;
-            min-height: 200px;
-        }
-        .preview-lt {
-            position: absolute;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(30, 30, 30, 0.9) 100%);
-            border-left: 4px solid #00d4ff;
-            padding: 15px 25px;
-            transition: all 0.3s ease;
-        }
-        .preview-lt .line1 {
-            font-weight: 700;
-            color: #fff;
-        }
-        .preview-lt .line2 {
-            color: #00d4ff;
-            margin-top: 5px;
-        }
-        .display-link {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-        }
-        .display-link a {
-            color: #00d4ff;
-            text-decoration: none;
-            font-size: 1.1rem;
-        }
-        .display-link a:hover {
-            text-decoration: underline;
-        }
-        .row {
-            display: flex;
-            gap: 15px;
-        }
-        .row > div {
-            flex: 1;
-        }
+        .range-value { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+
+        /* Color picker row */
+        .color-row { display: flex; gap: 8px; align-items: center; }
+        .color-row input[type="color"] { width: 36px; flex: none; }
+        .color-row input[type="text"] { flex: 1; }
+
+        /* Feed items */
         .feed-items {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            max-height: 150px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            padding: 10px 12px;
+            max-height: 120px;
             overflow-y: auto;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
         }
-        .feed-items p {
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .feed-items p:last-child {
-            border-bottom: none;
-        }
-        .ticker-preview {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 15px 20px;
-            overflow: hidden;
+        .feed-items p { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .feed-items p:last-child { border-bottom: none; }
+        .load-feed-row { display: flex; gap: 8px; }
+        .load-feed-row input { flex: 1; }
+        .btn-load-feed {
+            padding: 7px 14px;
+            background: rgba(249,115,22,0.2);
+            border: 1px solid rgba(249,115,22,0.4);
+            color: #fb923c;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
             white-space: nowrap;
-            border-left: 4px solid #ff9f43;
+            transition: background 0.15s;
         }
-        .ticker-preview span {
-            display: inline-block;
-            animation: scroll 120s linear infinite;
-        }
-        .ticker-preview.speed-slow span { animation-duration: 1000s; }
-        .ticker-preview.speed-medium span { animation-duration: 120s; }
-        .ticker-preview.speed-fast span { animation-duration: 45s; }
-        @keyframes scroll {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        .logo-preview {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .logo-preview img {
-            max-width: 100%;
-            max-height: 100%;
-        }
+        .btn-load-feed:hover { background: rgba(249,115,22,0.35); }
+
+        /* Preview boxes */
         .title-card-preview {
-            padding: 40px;
+            padding: 30px;
             text-align: center;
             border-radius: 8px;
+            min-height: 90px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .title-card-preview h3 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .title-card-preview p {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
+        .title-card-preview h3 { font-size: 1.4rem; margin-bottom: 6px; }
+        .title-card-preview p { font-size: 0.95rem; opacity: 0.8; }
         .breaking-preview {
             background: #dc2626;
             color: white;
-            padding: 15px 20px;
+            padding: 12px 16px;
             font-weight: bold;
             text-align: center;
+            border-radius: 6px;
             animation: pulse 1s ease-in-out infinite;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .range-value {
-            text-align: center;
-            font-size: 0.9rem;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            color: rgba(255,255,255,0.7);
-        }
-        .settings-btn {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 1000;
-            transition: background 0.2s;
-        }
-        .settings-btn:hover {
-            background: #444;
-            border-color: #00d4ff;
-        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+        /* ── Hidden status elements (JS compat) ──────────────────── */
+        .status-compat { display: none; }
+
+        /* ── Settings Modal ──────────────────────────────────────── */
         .modal-overlay {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
             z-index: 2000;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; align-items: center;
         }
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
         .modal {
             background: #1e1e2e;
             border: 1px solid #444;
             border-radius: 16px;
-            padding: 30px;
-            width: 500px;
-            max-width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 28px;
+            width: 500px; max-width: 92%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
-        .modal h2 {
-            color: #00d4ff;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
+        .modal h2 { color: #00d4ff; margin-bottom: 18px; font-size: 1.3rem; }
+        .modal label { display: block; margin-top: 14px; margin-bottom: 4px; color: #ccc; font-size: 0.85rem; }
+        .modal input[type="number"] {
+            width: 100%; padding: 9px 11px;
+            background: #2a2a3e; border: 1px solid #444;
+            border-radius: 7px; color: #fff; font-size: 0.95rem;
         }
-        .modal label {
-            display: block;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            color: #ccc;
-            font-size: 0.9rem;
-        }
-        .modal input {
-            width: 100%;
-            padding: 10px 12px;
-            background: #2a2a3e;
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
-        }
-        .modal input:focus {
-            outline: none;
-            border-color: #00d4ff;
-        }
-        .modal .url-list {
-            margin-top: 15px;
-            background: #2a2a3e;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        .modal .url-list p {
-            margin: 8px 0;
-            font-size: 0.85rem;
-            color: #aaa;
-        }
-        .modal .url-list code {
-            color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        .modal .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
+        .modal input:focus { outline: none; border-color: #00d4ff; }
+        .url-list { margin-top: 13px; background: #2a2a3e; border-radius: 7px; padding: 13px; }
+        .url-list p { margin: 6px 0; font-size: 0.82rem; color: #aaa; }
+        .url-list code { color: #00d4ff; background: rgba(0,212,255,0.1); padding: 2px 5px; border-radius: 3px; font-size: 0.82rem; word-break: break-all; }
+        .modal .btn-row { display: flex; gap: 10px; margin-top: 22px; }
         .modal .btn-save {
-            flex: 1;
-            padding: 12px;
+            flex: 1; padding: 11px;
             background: linear-gradient(135deg, #00d4ff, #0099cc);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
+            color: #fff; border: none; border-radius: 7px;
+            cursor: pointer; font-size: 0.95rem; font-weight: 600;
         }
-        .modal .btn-save:hover {
-            opacity: 0.9;
-        }
+        .modal .btn-save:hover { opacity: 0.9; }
         .modal .btn-cancel {
-            flex: 1;
-            padding: 12px;
-            background: #333;
-            color: #fff;
-            border: 1px solid #555;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
+            flex: 1; padding: 11px;
+            background: #333; color: #fff;
+            border: 1px solid #555; border-radius: 7px;
+            cursor: pointer; font-size: 0.95rem;
         }
-        .modal .btn-cancel:hover {
-            background: #444;
-        }
-        .modal .save-msg {
-            margin-top: 12px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            display: none;
-        }
-        .modal .save-msg.success {
-            display: block;
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-        .modal .save-msg.error {
-            display: block;
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
+        .modal .btn-cancel:hover { background: #444; }
+        .modal .save-msg { margin-top: 10px; padding: 9px; border-radius: 7px; font-size: 0.82rem; display: none; }
+        .modal .save-msg.success { display: block; background: rgba(76,175,80,0.2); color: #4caf50; border: 1px solid rgba(76,175,80,0.3); }
+        .modal .save-msg.error   { display: block; background: rgba(244,67,54,0.2); color: #f44336; border: 1px solid rgba(244,67,54,0.3); }
     </style>
 </head>
 <body>
-    <button class="settings-btn" onclick="openSettings()">Settings</button>
-    
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal">
-            <h2>App Settings</h2>
-            
-            <label for="settingsPort">Port Number</label>
-            <input type="number" id="settingsPort" value="{{ port }}" min="1" max="65535" placeholder="5000" oninput="updateUrls()">
-            
-            <div class="url-list">
-                <p><strong>App URLs:</strong></p>
-                <p>Control Panel: <code id="urlControl">http://localhost:{{ port }}/</code></p>
-                <p>Display (OBS): <code id="urlDisplay">http://localhost:{{ port }}/display</code></p>
-                <p>Multiview: <code id="urlMultiview">http://localhost:{{ port }}/multiview</code></p>
+
+<!-- ══ Settings Modal ══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <h2>App Settings</h2>
+        <label for="settingsPort">Port Number</label>
+        <input type="number" id="settingsPort" value="{{ port }}" min="1" max="65535" placeholder="5000" oninput="updateUrls()">
+        <div class="url-list">
+            <p><strong>App URLs:</strong></p>
+            <p>Control Panel: <code id="urlControl">http://localhost:{{ port }}/</code></p>
+            <p>Display (OBS): <code id="urlDisplay">http://localhost:{{ port }}/display</code></p>
+            <p>Multiview: <code id="urlMultiview">http://localhost:{{ port }}/multiview</code></p>
+        </div>
+        <div class="url-list" style="margin-top:10px">
+            <p><strong>Docker Run Command:</strong></p>
+            <p><code id="dockerCmd">docker run -p {{ port }}:5000 overlay-app</code></p>
+            <p style="font-size:0.75rem;color:#888;margin-top:4px">In Docker, change the first number to set your port. The app always listens on 5000 internally.</p>
+        </div>
+        <div id="saveMsg" class="save-msg"></div>
+        <div class="btn-row">
+            <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+            <button class="btn-save" onclick="savePort()">Save Port (Restart Required)</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ App Shell ═══════════════════════════════════════════════════ -->
+<div id="app">
+
+    <!-- Header -->
+    <div id="header">
+        <div id="header-title">
+            <div id="header-icon">⊞</div>
+            Overlay Control Panel
+        </div>
+        <button id="settings-btn" onclick="openSettings()" title="Settings">⚙</button>
+    </div>
+
+    <!-- Command Strip -->
+    <div id="command-strip">
+        <div class="cs-row">
+            <!-- Multiview -->
+            <div class="cs-cell" style="--section-color:#a855f7">
+                <div class="cs-label" style="color:#a855f7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    Multiview
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="multiview" style="--section-color:#a855f7" onclick="setActiveSection('multiview')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Config
+                    </button>
+                </div>
             </div>
-            
-            <div class="url-list" style="margin-top: 10px;">
-                <p><strong>Docker Run Command:</strong></p>
-                <p><code id="dockerCmd" style="word-break: break-all;">docker run -p {{ port }}:5000 overlay-app</code></p>
-                <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">In Docker, change the first number to set your port. The app always listens on 5000 internally.</p>
+            <!-- Lower Third -->
+            <div class="cs-cell" style="--section-color:#06b6d4">
+                <div class="cs-label" style="color:#06b6d4">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    Lower 3rd
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="lower-third" style="--section-color:#06b6d4" onclick="showLowerThird()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show
+                    </button>
+                    <button class="cs-hide" data-section="lower-third" onclick="hideLowerThird()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide
+                    </button>
+                </div>
             </div>
-            
-            <div id="saveMsg" class="save-msg"></div>
-            
-            <div class="btn-row">
-                <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
-                <button class="btn-save" onclick="savePort()">Save Port (Restart Required)</button>
+            <!-- RSS Ticker -->
+            <div class="cs-cell" style="--section-color:#f97316">
+                <div class="cs-label" style="color:#f97316">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor"/></svg>
+                    Ticker
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="rss-ticker" style="--section-color:#f97316" onclick="showTicker()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show
+                    </button>
+                    <button class="cs-hide" data-section="rss-ticker" onclick="hideTicker()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide
+                    </button>
+                </div>
+            </div>
+            <!-- Logo Bug -->
+            <div class="cs-cell" style="--section-color:#a855f7">
+                <div class="cs-label" style="color:#a855f7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    Logo
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="logo-bug" style="--section-color:#a855f7" onclick="showLogo()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show
+                    </button>
+                    <button class="cs-hide" data-section="logo-bug" onclick="hideLogo()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide
+                    </button>
+                </div>
+            </div>
+            <!-- Title Card -->
+            <div class="cs-cell" style="--section-color:#22c55e">
+                <div class="cs-label" style="color:#22c55e">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    Title
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="title-card" style="--section-color:#22c55e" onclick="showTitleCard()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show
+                    </button>
+                    <button class="cs-hide" data-section="title-card" onclick="hideTitleCard()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide
+                    </button>
+                </div>
+            </div>
+            <!-- Social Bar -->
+            <div class="cs-cell" style="--section-color:#ec4899">
+                <div class="cs-label" style="color:#ec4899">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Social
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="social-bar" style="--section-color:#ec4899" onclick="showSocial()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show
+                    </button>
+                    <button class="cs-hide" data-section="social-bar" onclick="hideSocial()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide
+                    </button>
+                </div>
+            </div>
+            <!-- Breaking News -->
+            <div class="cs-cell" style="--section-color:#ef4444">
+                <div class="cs-label" style="color:#ef4444">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Breaking
+                </div>
+                <div class="cs-btns">
+                    <button class="cs-show" data-section="breaking-news" style="--section-color:#ef4444" onclick="showBreaking()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Show
+                    </button>
+                    <button class="cs-hide" data-section="breaking-news" onclick="hideBreaking()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg> Hide
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
-    <div class="container">
-        <h1>Overlay Control Panel</h1>
-        
-        <!-- MULTIVIEW -->
-        <h2 class="section-title" style="border-color: #a855f7;">Multiview Layout</h2>
-        
-        <div class="control-group" style="border-color: #a855f7;">
-            <h2>Quadrant Assignments</h2>
-            <div class="row">
-                <div>
-                    <label for="mvQ1" style="color: #00d4ff;">Q1 (Top Left)</label>
-                    <select id="mvQ1" onchange="updateMultiviewQuadrant('q1', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="mvQ2" style="color: #ff6b6b;">Q2 (Top Right)</label>
-                    <select id="mvQ2" onchange="updateMultiviewQuadrant('q2', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <label for="mvQ3" style="color: #4ecdc4;">Q3 (Bottom Left)</label>
-                    <select id="mvQ3" onchange="updateMultiviewQuadrant('q3', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="mvQ4" style="color: #ffd93d;">Q4 (Bottom Right)</label>
-                    <select id="mvQ4" onchange="updateMultiviewQuadrant('q4', this.value)">
-                        <option value="all">All Elements</option>
-                        <option value="lowerthird">Lower Third</option>
-                        <option value="ticker">RSS Ticker</option>
-                        <option value="logo">Logo Bug</option>
-                        <option value="titlecard">Title Card</option>
-                        <option value="social">Social Bar</option>
-                        <option value="breaking">Breaking News</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
+
+    <!-- Main body -->
+    <div id="main">
+
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <nav id="sidebar-nav">
+                <button class="nav-item" data-section="multiview" style="--section-color:#a855f7" onclick="setActiveSection('multiview')">
+                    <span class="nav-icon" style="color:#a855f7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+                    <span class="nav-label">Multiview</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+                <button class="nav-item active" data-section="lower-third" style="--section-color:#06b6d4" onclick="setActiveSection('lower-third')">
+                    <span class="nav-icon" style="color:#06b6d4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></span>
+                    <span class="nav-label">Lower Third</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+                <button class="nav-item" data-section="rss-ticker" style="--section-color:#f97316" onclick="setActiveSection('rss-ticker')">
+                    <span class="nav-icon" style="color:#f97316"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor"/></svg></span>
+                    <span class="nav-label">RSS Ticker</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+                <button class="nav-item" data-section="logo-bug" style="--section-color:#a855f7" onclick="setActiveSection('logo-bug')">
+                    <span class="nav-icon" style="color:#a855f7"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                    <span class="nav-label">Logo Bug</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+                <button class="nav-item" data-section="title-card" style="--section-color:#22c55e" onclick="setActiveSection('title-card')">
+                    <span class="nav-icon" style="color:#22c55e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+                    <span class="nav-label">Title Card</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+                <button class="nav-item" data-section="social-bar" style="--section-color:#ec4899" onclick="setActiveSection('social-bar')">
+                    <span class="nav-icon" style="color:#ec4899"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+                    <span class="nav-label">Social Media Bar</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+                <button class="nav-item" data-section="breaking-news" style="--section-color:#ef4444" onclick="setActiveSection('breaking-news')">
+                    <span class="nav-icon" style="color:#ef4444"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                    <span class="nav-label">Breaking News</span>
+                    <span class="nav-right"><span class="nav-dot"></span></span>
+                </button>
+            </nav>
+            <div id="sidebar-footer">
+                <button id="update-btn" onclick="updateActive()">
+                    ✦ <span id="updateBtnLabel">Update Lower Third</span>
+                </button>
             </div>
         </div>
-        
-        <!-- LOWER THIRD -->
-        <h2 class="section-title cyan">Lower Third</h2>
-        
-        <div class="control-group cyan">
-            <h2>Text Content</h2>
-            <label for="line1">Line 1 (Name)</label>
-            <input type="text" id="line1" placeholder="Enter name..." value="John Smith">
-            <label for="line2">Line 2 (Title)</label>
-            <input type="text" id="line2" placeholder="Enter title..." value="Software Engineer">
-        </div>
-        
-        <div class="control-group cyan">
-            <h2>Image (Optional)</h2>
-            <label for="ltImageUrl">Image URL (logo, headshot, etc.)</label>
-            <input type="url" id="ltImageUrl" placeholder="https://example.com/photo.jpg">
-            <label for="ltImageShape">Image Shape</label>
-            <select id="ltImageShape">
-                <option value="square">Square</option>
-                <option value="circle">Circle</option>
-                <option value="rounded">Rounded</option>
-            </select>
-        </div>
-        
-        <div class="control-group cyan">
-            <h2>Layout</h2>
-            <div class="row">
-                <div>
-                    <label for="position">Position</label>
-                    <select id="position">
-                        <option value="bottom-left">Bottom Left</option>
-                        <option value="bottom-center">Bottom Center</option>
-                        <option value="bottom-right">Bottom Right</option>
-                        <option value="top-left">Top Left</option>
-                        <option value="top-center">Top Center</option>
-                        <option value="top-right">Top Right</option>
-                    </select>
+
+        <!-- Content panels -->
+        <div id="content">
+
+            <!-- MULTIVIEW ─────────────────────────── -->
+            <div id="panel-multiview" class="panel">
+                <div class="panel-title" style="color:#a855f7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                    <h2>Multiview Layout</h2>
                 </div>
-                <div>
-                    <label for="textSize">Text Size</label>
-                    <select id="textSize">
-                        <option value="small">Small</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="large">Large</option>
-                        <option value="xlarge">Extra Large</option>
-                    </select>
+                <p class="panel-desc">Assign overlay elements to each quadrant of the multiview grid.</p>
+                <div class="form-card">
+                    <div class="form-card-title">Quadrant Assignments</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="mvQ1">Q1 — Top Left</label>
+                            <select id="mvQ1" onchange="updateMultiviewQuadrant('q1', this.value)">
+                                <option value="all">All Elements</option>
+                                <option value="lowerthird">Lower Third</option>
+                                <option value="ticker">RSS Ticker</option>
+                                <option value="logo">Logo Bug</option>
+                                <option value="titlecard">Title Card</option>
+                                <option value="social">Social Bar</option>
+                                <option value="breaking">Breaking News</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mvQ2">Q2 — Top Right</label>
+                            <select id="mvQ2" onchange="updateMultiviewQuadrant('q2', this.value)">
+                                <option value="all">All Elements</option>
+                                <option value="lowerthird">Lower Third</option>
+                                <option value="ticker">RSS Ticker</option>
+                                <option value="logo">Logo Bug</option>
+                                <option value="titlecard">Title Card</option>
+                                <option value="social">Social Bar</option>
+                                <option value="breaking">Breaking News</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mvQ3">Q3 — Bottom Left</label>
+                            <select id="mvQ3" onchange="updateMultiviewQuadrant('q3', this.value)">
+                                <option value="all">All Elements</option>
+                                <option value="lowerthird">Lower Third</option>
+                                <option value="ticker">RSS Ticker</option>
+                                <option value="logo">Logo Bug</option>
+                                <option value="titlecard">Title Card</option>
+                                <option value="social">Social Bar</option>
+                                <option value="breaking">Breaking News</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="mvQ4">Q4 — Bottom Right</label>
+                            <select id="mvQ4" onchange="updateMultiviewQuadrant('q4', this.value)">
+                                <option value="all">All Elements</option>
+                                <option value="lowerthird">Lower Third</option>
+                                <option value="ticker">RSS Ticker</option>
+                                <option value="logo">Logo Bug</option>
+                                <option value="titlecard">Title Card</option>
+                                <option value="social">Social Bar</option>
+                                <option value="breaking">Breaking News</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
+                <p style="font-size:0.78rem;color:#475569;text-align:center">
+                    <a href="/multiview" target="_blank" style="color:#a855f7">Open Multiview Window ↗</a>
+                    &nbsp;·&nbsp;
+                    <a href="/display" target="_blank" style="color:#06b6d4">Open Display (OBS) ↗</a>
+                </p>
             </div>
-            <div class="row">
-                <div>
-                    <label for="ltWidth">Width</label>
-                    <select id="ltWidth">
-                        <option value="compact">Compact (Fit Content)</option>
-                        <option value="full">Full Screen Width</option>
-                    </select>
+
+            <!-- LOWER THIRD ───────────────────────── -->
+            <div id="panel-lower-third" class="panel active">
+                <div class="panel-title" style="color:#06b6d4">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+                    <h2>Lower Third</h2>
                 </div>
-                <div>
-                    <label for="duration">Auto-hide (seconds, 0 = manual)</label>
-                    <input type="number" id="duration" value="5" min="0" max="60">
+                <p class="panel-desc">Configure the name/title overlay that appears at the bottom of screen.</p>
+
+                <div class="form-card">
+                    <div class="form-card-title">Content</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="line1">Line 1 — Name</label>
+                            <input type="text" id="line1" placeholder="Enter name..." value="John Smith">
+                        </div>
+                        <div class="form-group">
+                            <label for="line2">Line 2 — Title</label>
+                            <input type="text" id="line2" placeholder="Enter title..." value="Software Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label for="ltImageUrl">Image URL (optional)</label>
+                            <input type="url" id="ltImageUrl" placeholder="https://example.com/photo.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label for="ltImageShape">Image Shape</label>
+                            <select id="ltImageShape">
+                                <option value="square">Square</option>
+                                <option value="circle">Circle</option>
+                                <option value="rounded">Rounded</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Layout & Style</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ltStyle">Style Preset</label>
+                            <select id="ltStyle">
+                                <option value="modern">Modern (Gradient)</option>
+                                <option value="classic">Classic (Solid)</option>
+                                <option value="minimal">Minimal (Clean)</option>
+                                <option value="bold">Bold (Full Width)</option>
+                                <option value="news">News (Bar Style)</option>
+                                <option value="elegant">Elegant (Thin Border)</option>
+                                <option value="neon">Neon (Glow Effect)</option>
+                                <option value="glass">Glass (Transparent)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Position</label>
+                            <select id="position">
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-center">Bottom Center</option>
+                                <option value="bottom-right">Bottom Right</option>
+                                <option value="top-left">Top Left</option>
+                                <option value="top-center">Top Center</option>
+                                <option value="top-right">Top Right</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ltWidth">Width</label>
+                            <select id="ltWidth">
+                                <option value="compact">Compact (Fit Content)</option>
+                                <option value="full">Full Screen Width</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="textSize">Text Size</label>
+                            <select id="textSize">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                                <option value="xlarge">Extra Large</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ltFont">Font</label>
+                            <select id="ltFont">
+                                <option value="Segoe UI">Segoe UI</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Comic Sans MS">Comic Sans MS</option>
+                                <option value="Courier New">Courier New</option>
+                                <option value="custom">Custom Font (URL below)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Auto-hide (seconds, 0 = manual)</label>
+                            <input type="number" id="duration" value="5" min="0" max="60">
+                        </div>
+                        <div class="form-group">
+                            <label for="ltCustomFontUrl">Custom Font URL</label>
+                            <input type="url" id="ltCustomFontUrl" placeholder="https://example.com/font.woff2">
+                        </div>
+                        <div class="form-group">
+                            <label for="ltCustomFontName">Custom Font Name</label>
+                            <input type="text" id="ltCustomFontName" placeholder="My Custom Font">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Colors</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ltBgColor">Background Color</label>
+                            <div class="color-row">
+                                <input type="color" id="ltBgColor" value="#1a1a2e">
+                                <input type="text" value="#1a1a2e" oninput="document.getElementById('ltBgColor').value=this.value" onfocus="this.select()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ltAccentColor">Accent Color</label>
+                            <div class="color-row">
+                                <input type="color" id="ltAccentColor" value="#00d4ff">
+                                <input type="text" value="#00d4ff" oninput="document.getElementById('ltAccentColor').value=this.value" onfocus="this.select()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ltTextColor">Text Color</label>
+                            <div class="color-row">
+                                <input type="color" id="ltTextColor" value="#ffffff">
+                                <input type="text" value="#ffffff" oninput="document.getElementById('ltTextColor').value=this.value" onfocus="this.select()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="ltStatus" class="status-compat"></div>
             </div>
-            <div class="row">
-                <div>
-                    <label for="ltFont">Font</label>
-                    <select id="ltFont">
-                        <option value="Segoe UI">Segoe UI</option>
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Trebuchet MS">Trebuchet MS</option>
-                        <option value="Impact">Impact</option>
-                        <option value="Comic Sans MS">Comic Sans MS</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="custom">Custom Font (URL below)</option>
-                    </select>
+
+            <!-- RSS TICKER ────────────────────────── -->
+            <div id="panel-rss-ticker" class="panel">
+                <div class="panel-title" style="color:#f97316">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1" fill="currentColor"/></svg>
+                    <h2>RSS Ticker</h2>
                 </div>
-                <div></div>
+                <p class="panel-desc">Configure a scrolling news ticker from an RSS feed.</p>
+
+                <div class="form-card">
+                    <div class="form-card-title">Feed</div>
+                    <div class="form-group" style="margin-bottom:12px">
+                        <label for="feedUrl">RSS Feed URL</label>
+                        <div class="load-feed-row">
+                            <input type="url" id="feedUrl" placeholder="https://example.com/rss.xml">
+                            <button class="btn-load-feed" onclick="loadFeed()">Load Feed</button>
+                        </div>
+                    </div>
+                    <label style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Feed Items</label>
+                    <div id="feedItems" class="feed-items" style="margin-top:6px">
+                        <p>No feed loaded. Enter a URL and click "Load Feed".</p>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Appearance</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="tickerPosition">Position</label>
+                            <select id="tickerPosition">
+                                <option value="bottom">Bottom</option>
+                                <option value="top">Top</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tickerTextSize">Text Size</label>
+                            <select id="tickerTextSize">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tickerSpeed">Scroll Speed</label>
+                            <select id="tickerSpeed">
+                                <option value="slow">Slow</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="fast">Fast</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tickerFont">Font</label>
+                            <select id="tickerFont">
+                                <option value="Segoe UI">Segoe UI</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="tickerStatus" class="status-compat"></div>
             </div>
-            <label for="ltCustomFontUrl">Custom Font URL (.ttf, .otf, .woff, .woff2)</label>
-            <input type="url" id="ltCustomFontUrl" placeholder="https://example.com/font.woff2">
-            <label for="ltCustomFontName">Custom Font Name</label>
-            <input type="text" id="ltCustomFontName" placeholder="My Custom Font">
-        </div>
-        
-        <div class="control-group cyan">
-            <h2>Style</h2>
-            <label for="ltStyle">Style Preset</label>
-            <select id="ltStyle">
-                <option value="modern">Modern (Gradient)</option>
-                <option value="classic">Classic (Solid)</option>
-                <option value="minimal">Minimal (Clean)</option>
-                <option value="bold">Bold (Full Width)</option>
-                <option value="news">News (Bar Style)</option>
-                <option value="elegant">Elegant (Thin Border)</option>
-                <option value="neon">Neon (Glow Effect)</option>
-                <option value="glass">Glass (Transparent)</option>
-            </select>
-            <div class="row">
-                <div>
-                    <label for="ltBgColor">Background Color</label>
-                    <input type="color" id="ltBgColor" value="#1a1a2e">
+
+            <!-- LOGO BUG ──────────────────────────── -->
+            <div id="panel-logo-bug" class="panel">
+                <div class="panel-title" style="color:#a855f7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <h2>Logo Bug</h2>
                 </div>
-                <div>
-                    <label for="ltAccentColor">Accent Color</label>
-                    <input type="color" id="ltAccentColor" value="#00d4ff">
+                <p class="panel-desc">Persistent logo/watermark overlay in a screen corner.</p>
+
+                <div class="form-card">
+                    <div class="form-card-title">Logo Settings</div>
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column:1/-1">
+                            <label for="logoUrl">Logo Image URL (PNG with transparency recommended)</label>
+                            <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
+                        </div>
+                        <div class="form-group">
+                            <label for="logoPosition">Position</label>
+                            <select id="logoPosition">
+                                <option value="top-left">Top Left</option>
+                                <option value="top-right" selected>Top Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-right">Bottom Right</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="logoSize">Size</label>
+                            <select id="logoSize">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1">
+                            <label for="logoOpacity">Opacity — <span id="opacityValue">100</span>%</label>
+                            <input type="range" id="logoOpacity" min="10" max="100" value="100" style="accent-color:#a855f7">
+                        </div>
+                    </div>
                 </div>
+                <div id="logoStatus" class="status-compat"></div>
             </div>
-            <div class="row">
-                <div>
-                    <label for="ltTextColor">Text Color</label>
-                    <input type="color" id="ltTextColor" value="#ffffff">
+
+            <!-- TITLE CARD ────────────────────────── -->
+            <div id="panel-title-card" class="panel">
+                <div class="panel-title" style="color:#22c55e">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <h2>Full-Screen Title Card</h2>
                 </div>
-                <div></div>
+                <p class="panel-desc">Full-screen title overlay for segment transitions and introductions.</p>
+
+                <div class="form-card">
+                    <div class="form-card-title">Content</div>
+                    <div class="form-grid single">
+                        <div class="form-group">
+                            <label for="titleText">Title</label>
+                            <input type="text" id="titleText" placeholder="Welcome" value="Welcome">
+                        </div>
+                        <div class="form-group">
+                            <label for="subtitleText">Subtitle (optional)</label>
+                            <input type="text" id="subtitleText" placeholder="To the show...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Appearance</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="titleBgColor">Background Color</label>
+                            <div class="color-row">
+                                <input type="color" id="titleBgColor" value="#000000">
+                                <input type="text" value="#000000" oninput="document.getElementById('titleBgColor').value=this.value" onfocus="this.select()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="titleTextColor">Text Color</label>
+                            <div class="color-row">
+                                <input type="color" id="titleTextColor" value="#ffffff">
+                                <input type="text" value="#ffffff" oninput="document.getElementById('titleTextColor').value=this.value" onfocus="this.select()">
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1">
+                            <label for="titleBgImage">Background Image URL (optional)</label>
+                            <input type="url" id="titleBgImage" placeholder="https://example.com/background.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label for="titleFont">Font</label>
+                            <select id="titleFont">
+                                <option value="Segoe UI">Segoe UI</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Playfair Display">Playfair Display</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Preview</div>
+                    <div id="titleCardPreview" class="title-card-preview" style="background:#000;color:#fff">
+                        <h3>Welcome</h3>
+                        <p></p>
+                    </div>
+                </div>
+                <div id="titleStatus" class="status-compat"></div>
             </div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn-update" onclick="updateLowerThird()">Update Settings</button>
-        </div>
-        <div class="button-group">
-            <button class="btn-show" onclick="showLowerThird()">Show</button>
-            <button class="btn-hide" onclick="hideLowerThird()">Hide</button>
-        </div>
-        <div id="ltStatus" class="status hidden">Lower Third: Hidden</div>
-        
-        <!-- RSS TICKER -->
-        <h2 class="section-title orange">RSS Ticker</h2>
-        
-        <div class="control-group orange">
-            <h2>RSS Feed</h2>
-            <label for="feedUrl">RSS Feed URL</label>
-            <input type="url" id="feedUrl" placeholder="https://example.com/rss.xml">
-            <div class="button-group">
-                <button class="btn-refresh" onclick="loadFeed()">Load Feed</button>
+
+            <!-- SOCIAL MEDIA BAR ──────────────────── -->
+            <div id="panel-social-bar" class="panel">
+                <div class="panel-title" style="color:#ec4899">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    <h2>Social Media Bar</h2>
+                </div>
+                <p class="panel-desc">Display social media handles and platform icons on screen.</p>
+
+                <div class="form-card">
+                    <div class="form-card-title">Social Handles (leave blank to hide)</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="socialTwitter">Twitter / X</label>
+                            <input type="text" id="socialTwitter" placeholder="@username">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialYoutube">YouTube</label>
+                            <input type="text" id="socialYoutube" placeholder="@channel">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialInstagram">Instagram</label>
+                            <input type="text" id="socialInstagram" placeholder="@username">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialTiktok">TikTok</label>
+                            <input type="text" id="socialTiktok" placeholder="@username">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialFacebook">Facebook</label>
+                            <input type="text" id="socialFacebook" placeholder="pagename">
+                        </div>
+                        <div class="form-group">
+                            <label for="socialWebsite">Website</label>
+                            <input type="text" id="socialWebsite" placeholder="example.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Display Settings</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="socialPosition">Position</label>
+                            <select id="socialPosition">
+                                <option value="top">Top</option>
+                                <option value="bottom" selected>Bottom</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="socialFont">Font</label>
+                            <select id="socialFont">
+                                <option value="Segoe UI">Segoe UI</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="socialStatus" class="status-compat"></div>
             </div>
-            <label style="margin-top: 15px;">Feed Items</label>
-            <div id="feedItems" class="feed-items">
-                <p>No feed loaded. Enter a URL and click "Load Feed".</p>
+
+            <!-- BREAKING NEWS ─────────────────────── -->
+            <div id="panel-breaking-news" class="panel">
+                <div class="panel-title" style="color:#ef4444">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <h2>Breaking News Banner</h2>
+                </div>
+                <p class="panel-desc">Urgent full-width breaking news banner with pulsing animation.</p>
+
+                <div class="form-card">
+                    <div class="form-card-title">Banner Content</div>
+                    <div class="form-grid single">
+                        <div class="form-group">
+                            <label for="breakingText">Headline Text</label>
+                            <input type="text" id="breakingText" placeholder="BREAKING NEWS: ..." value="BREAKING NEWS" style="border-color:rgba(239,68,68,0.4)">
+                        </div>
+                        <div class="form-group">
+                            <label for="breakingFont">Font</label>
+                            <select id="breakingFont">
+                                <option value="Segoe UI">Segoe UI</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Helvetica">Helvetica</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Trebuchet MS">Trebuchet MS</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <div class="form-card-title">Preview</div>
+                    <div id="breakingPreview" class="breaking-preview">BREAKING NEWS</div>
+                </div>
+                <div id="breakingStatus" class="status-compat"></div>
             </div>
-        </div>
-        
-        <div class="control-group orange">
-            <h2>Ticker Appearance</h2>
-            <div class="row">
-                <div>
-                    <label for="tickerPosition">Position</label>
-                    <select id="tickerPosition">
-                        <option value="bottom">Bottom</option>
-                        <option value="top">Top</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="tickerTextSize">Text Size</label>
-                    <select id="tickerTextSize">
-                        <option value="small">Small</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="large">Large</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <label for="tickerSpeed">Scroll Speed</label>
-                    <select id="tickerSpeed">
-                        <option value="slow">Slow</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="fast">Fast</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="tickerFont">Font</label>
-                    <select id="tickerFont">
-                        <option value="Segoe UI">Segoe UI</option>
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Trebuchet MS">Trebuchet MS</option>
-                        <option value="Impact">Impact</option>
-                        <option value="Courier New">Courier New</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn-update" onclick="updateTicker()">Update Ticker</button>
-        </div>
-        <div class="button-group">
-            <button class="btn-show" onclick="showTicker()">Show</button>
-            <button class="btn-hide" onclick="hideTicker()">Hide</button>
-        </div>
-        <div id="tickerStatus" class="status hidden">Ticker: Hidden</div>
-        
-        <!-- LOGO BUG -->
-        <h2 class="section-title purple">Logo Bug</h2>
-        
-        <div class="control-group purple">
-            <h2>Logo Settings</h2>
-            <label for="logoUrl">Logo Image URL</label>
-            <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
-            <div class="row">
-                <div>
-                    <label for="logoPosition">Position</label>
-                    <select id="logoPosition">
-                        <option value="top-left">Top Left</option>
-                        <option value="top-right" selected>Top Right</option>
-                        <option value="bottom-left">Bottom Left</option>
-                        <option value="bottom-right">Bottom Right</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="logoSize">Size</label>
-                    <select id="logoSize">
-                        <option value="small">Small</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="large">Large</option>
-                    </select>
-                </div>
-            </div>
-            <label for="logoOpacity">Opacity</label>
-            <input type="range" id="logoOpacity" min="10" max="100" value="100">
-            <div class="range-value"><span id="opacityValue">100</span>%</div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn-update" onclick="updateLogo()">Update Logo</button>
-        </div>
-        <div class="button-group">
-            <button class="btn-show" onclick="showLogo()">Show</button>
-            <button class="btn-hide" onclick="hideLogo()">Hide</button>
-        </div>
-        <div id="logoStatus" class="status hidden">Logo: Hidden</div>
-        
-        <!-- TITLE CARD -->
-        <h2 class="section-title green">Full-Screen Title Card</h2>
-        
-        <div class="control-group green">
-            <h2>Title Card Content</h2>
-            <label for="titleText">Title</label>
-            <input type="text" id="titleText" placeholder="Welcome" value="Welcome">
-            <label for="subtitleText">Subtitle (optional)</label>
-            <input type="text" id="subtitleText" placeholder="To the show...">
-            <div class="row">
-                <div>
-                    <label for="titleBgColor">Background Color</label>
-                    <input type="color" id="titleBgColor" value="#000000">
-                </div>
-                <div>
-                    <label for="titleTextColor">Text Color</label>
-                    <input type="color" id="titleTextColor" value="#ffffff">
-                </div>
-            </div>
-            <label for="titleBgImage">Background Image URL (optional)</label>
-            <input type="url" id="titleBgImage" placeholder="https://example.com/background.jpg">
-            <label for="titleFont">Font</label>
-            <select id="titleFont">
-                <option value="Segoe UI">Segoe UI</option>
-                <option value="Arial">Arial</option>
-                <option value="Helvetica">Helvetica</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Trebuchet MS">Trebuchet MS</option>
-                <option value="Impact">Impact</option>
-                <option value="Playfair Display">Playfair Display</option>
-                <option value="Courier New">Courier New</option>
-            </select>
-        </div>
-        
-        <div class="control-group green">
-            <h2>Preview</h2>
-            <div id="titleCardPreview" class="title-card-preview" style="background: #000; color: #fff;">
-                <h3>Welcome</h3>
-                <p></p>
-            </div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn-update" onclick="updateTitleCard()">Update Title Card</button>
-        </div>
-        <div class="button-group">
-            <button class="btn-show" onclick="showTitleCard()">Show</button>
-            <button class="btn-hide" onclick="hideTitleCard()">Hide</button>
-        </div>
-        <div id="titleStatus" class="status hidden">Title Card: Hidden</div>
-        
-        <!-- SOCIAL MEDIA BAR -->
-        <h2 class="section-title pink">Social Media Bar</h2>
-        
-        <div class="control-group pink">
-            <h2>Social Handles</h2>
-            <div class="row">
-                <div>
-                    <label for="socialTwitter">Twitter/X</label>
-                    <input type="text" id="socialTwitter" placeholder="@username">
-                </div>
-                <div>
-                    <label for="socialYoutube">YouTube</label>
-                    <input type="text" id="socialYoutube" placeholder="@channel">
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <label for="socialInstagram">Instagram</label>
-                    <input type="text" id="socialInstagram" placeholder="@username">
-                </div>
-                <div>
-                    <label for="socialTiktok">TikTok</label>
-                    <input type="text" id="socialTiktok" placeholder="@username">
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <label for="socialFacebook">Facebook</label>
-                    <input type="text" id="socialFacebook" placeholder="pagename">
-                </div>
-                <div>
-                    <label for="socialWebsite">Website</label>
-                    <input type="text" id="socialWebsite" placeholder="example.com">
-                </div>
-            </div>
-            <div class="row">
-                <div>
-                    <label for="socialPosition">Position</label>
-                    <select id="socialPosition">
-                        <option value="top">Top</option>
-                        <option value="bottom" selected>Bottom</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="socialFont">Font</label>
-                    <select id="socialFont">
-                        <option value="Segoe UI">Segoe UI</option>
-                        <option value="Arial">Arial</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Trebuchet MS">Trebuchet MS</option>
-                        <option value="Courier New">Courier New</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn-update" onclick="updateSocial()">Update Social Bar</button>
-        </div>
-        <div class="button-group">
-            <button class="btn-show" onclick="showSocial()">Show</button>
-            <button class="btn-hide" onclick="hideSocial()">Hide</button>
-        </div>
-        <div id="socialStatus" class="status hidden">Social Bar: Hidden</div>
-        
-        <!-- BREAKING NEWS -->
-        <h2 class="section-title red">Breaking News Banner</h2>
-        
-        <div class="control-group red">
-            <h2>Breaking News</h2>
-            <label for="breakingText">Breaking News Text</label>
-            <input type="text" id="breakingText" placeholder="BREAKING NEWS: ..." value="BREAKING NEWS">
-            <label for="breakingFont">Font</label>
-            <select id="breakingFont">
-                <option value="Segoe UI">Segoe UI</option>
-                <option value="Arial">Arial</option>
-                <option value="Helvetica">Helvetica</option>
-                <option value="Impact">Impact</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Trebuchet MS">Trebuchet MS</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Courier New">Courier New</option>
-            </select>
-        </div>
-        
-        <div class="control-group red">
-            <h2>Preview</h2>
-            <div id="breakingPreview" class="breaking-preview">BREAKING NEWS</div>
-        </div>
-        
-        <div class="button-group">
-            <button class="btn-update" onclick="updateBreaking()">Update Banner</button>
-        </div>
-        <div class="button-group">
-            <button class="btn-show" onclick="showBreaking()">Show</button>
-            <button class="btn-hide" onclick="hideBreaking()">Hide</button>
-        </div>
-        <div id="breakingStatus" class="status hidden">Breaking News: Hidden</div>
-        
-        <div class="display-link">
-            <a href="/display" target="_blank">Open Display Window (for OBS/streaming)</a>
-            &nbsp;|&nbsp;
-            <a href="/multiview" target="_blank">Open Multiview Window</a>
-        </div>
-    </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
-    <script>
-        const socket = io();
-        
-        socket.on('connect', () => console.log('Connected to server'));
-        
-        // Lower Third
-        socket.on('state_update', (state) => {
-            document.getElementById('line1').value = state.line1;
-            document.getElementById('line2').value = state.line2;
-            document.getElementById('position').value = state.position;
-            document.getElementById('textSize').value = state.textSize;
-            document.getElementById('duration').value = state.duration;
-            document.getElementById('ltWidth').value = state.width || 'compact';
-            document.getElementById('ltFont').value = state.font || 'Segoe UI';
-            document.getElementById('ltCustomFontUrl').value = state.customFontUrl || '';
-            document.getElementById('ltCustomFontName').value = state.customFontName || '';
-            document.getElementById('ltStyle').value = state.style || 'modern';
-            document.getElementById('ltBgColor').value = state.bgColor || '#1a1a2e';
-            document.getElementById('ltAccentColor').value = state.accentColor || '#00d4ff';
-            document.getElementById('ltTextColor').value = state.textColor || '#ffffff';
-            document.getElementById('ltImageUrl').value = state.imageUrl || '';
-            document.getElementById('ltImageShape').value = state.imageShape || 'square';
-            updateStatus('ltStatus', 'Lower Third', state.visible);
-        });
-        
-        function updateLowerThird() {
-            fetch('/api/state', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    line1: document.getElementById('line1').value,
-                    line2: document.getElementById('line2').value,
-                    position: document.getElementById('position').value,
-                    textSize: document.getElementById('textSize').value,
-                    duration: parseInt(document.getElementById('duration').value),
-                    width: document.getElementById('ltWidth').value,
-                    font: document.getElementById('ltFont').value,
-                    customFontUrl: document.getElementById('ltCustomFontUrl').value,
-                    customFontName: document.getElementById('ltCustomFontName').value,
-                    style: document.getElementById('ltStyle').value,
-                    bgColor: document.getElementById('ltBgColor').value,
-                    accentColor: document.getElementById('ltAccentColor').value,
-                    textColor: document.getElementById('ltTextColor').value,
-                    imageUrl: document.getElementById('ltImageUrl').value,
-                    imageShape: document.getElementById('ltImageShape').value
-                })
-            });
-        }
-        
-        function showLowerThird() { updateLowerThird(); socket.emit('show'); }
-        function hideLowerThird() { socket.emit('hide'); }
-        
-        // Ticker
-        socket.on('ticker_update', (state) => {
-            document.getElementById('feedUrl').value = state.feedUrl || '';
-            document.getElementById('tickerPosition').value = state.position;
-            document.getElementById('tickerTextSize').value = state.textSize;
-            document.getElementById('tickerSpeed').value = state.speed || 'medium';
-            document.getElementById('tickerFont').value = state.font || 'Segoe UI';
-            updateFeedItems(state.items);
-            updateStatus('tickerStatus', 'Ticker', state.visible);
-        });
-        
-        function loadFeed() {
-            const feedUrl = document.getElementById('feedUrl').value;
-            if (!feedUrl) { alert('Please enter an RSS feed URL'); return; }
-            fetch('/api/ticker', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ feedUrl: feedUrl })
-            }).then(res => res.json()).then(data => updateFeedItems(data.items));
-        }
-        
-        function updateFeedItems(items) {
-            const container = document.getElementById('feedItems');
-            if (!items || items.length === 0) {
-                container.innerHTML = '<p>No items found in feed.</p>';
-                return;
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</div><!-- /app -->
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    // ── Socket.IO (optional enhancement; HTTP polling in display.html is primary) ──
+    const socket = io({ transports: ['websocket', 'polling'] });
+    socket.on('connect', () => console.log('Connected to server'));
+
+    // ── Sidebar navigation ──────────────────────────────────────────
+    const SECTION_LABELS = {
+        'multiview':     { short: 'Multiview',    update: null },
+        'lower-third':   { short: 'Lower Third',  update: () => updateLowerThird() },
+        'rss-ticker':    { short: 'RSS Ticker',    update: () => updateTicker() },
+        'logo-bug':      { short: 'Logo Bug',      update: () => updateLogo() },
+        'title-card':    { short: 'Title Card',    update: () => updateTitleCard() },
+        'social-bar':    { short: 'Social Bar',    update: () => updateSocial() },
+        'breaking-news': { short: 'Breaking News', update: () => updateBreaking() }
+    };
+    let activeSection = 'lower-third';
+
+    function setActiveSection(sectionId) {
+        document.querySelectorAll('.panel.active').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + sectionId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelector('.nav-item[data-section="' + sectionId + '"]').classList.add('active');
+        const s = SECTION_LABELS[sectionId];
+        document.getElementById('updateBtnLabel').textContent = 'Update ' + s.short;
+        document.getElementById('update-btn').style.display = s.update ? 'flex' : 'none';
+        activeSection = sectionId;
+    }
+
+    function updateActive() {
+        const fn = SECTION_LABELS[activeSection]?.update;
+        if (fn) fn();
+    }
+
+    // ── Visibility state tracking ───────────────────────────────────
+    const sectionVisible = {};
+
+    function setSectionVisible(sectionId, visible) {
+        sectionVisible[sectionId] = visible;
+        // Sidebar badge
+        const navItem = document.querySelector('.nav-item[data-section="' + sectionId + '"]');
+        if (navItem) {
+            let badge = navItem.querySelector('.status-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'status-badge';
+                navItem.querySelector('.nav-right').insertBefore(badge, navItem.querySelector('.nav-dot'));
             }
-            container.innerHTML = items.map(item => `<p>${item}</p>`).join('');
+            badge.textContent = visible ? 'ON' : 'OFF';
+            badge.className = 'status-badge ' + (visible ? 'on' : 'off');
         }
-        
-        function updateTicker() {
-            fetch('/api/ticker', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    position: document.getElementById('tickerPosition').value,
-                    textSize: document.getElementById('tickerTextSize').value,
-                    speed: document.getElementById('tickerSpeed').value,
-                    font: document.getElementById('tickerFont').value
-                })
-            });
-        }
-        
-        function showTicker() { updateTicker(); socket.emit('ticker_show'); }
-        function hideTicker() { socket.emit('ticker_hide'); }
-        
-        // Logo
-        socket.on('logo_update', (state) => {
-            document.getElementById('logoUrl').value = state.imageUrl || '';
-            document.getElementById('logoPosition').value = state.position;
-            document.getElementById('logoSize').value = state.size;
-            document.getElementById('logoOpacity').value = state.opacity;
-            document.getElementById('opacityValue').textContent = state.opacity;
-            updateStatus('logoStatus', 'Logo', state.visible);
+        // Command strip buttons
+        const showBtn = document.querySelector('.cs-show[data-section="' + sectionId + '"]');
+        const hideBtn = document.querySelector('.cs-hide[data-section="' + sectionId + '"]');
+        if (showBtn) showBtn.classList.toggle('on', visible === true);
+        if (hideBtn) hideBtn.classList.toggle('off', visible === false);
+    }
+
+    // ── Lower Third ─────────────────────────────────────────────────
+    socket.on('state_update', (state) => {
+        document.getElementById('line1').value = state.line1;
+        document.getElementById('line2').value = state.line2;
+        document.getElementById('position').value = state.position;
+        document.getElementById('textSize').value = state.textSize;
+        document.getElementById('duration').value = state.duration;
+        document.getElementById('ltWidth').value = state.width || 'compact';
+        document.getElementById('ltFont').value = state.font || 'Segoe UI';
+        document.getElementById('ltCustomFontUrl').value = state.customFontUrl || '';
+        document.getElementById('ltCustomFontName').value = state.customFontName || '';
+        document.getElementById('ltStyle').value = state.style || 'modern';
+        document.getElementById('ltBgColor').value = state.bgColor || '#1a1a2e';
+        document.getElementById('ltAccentColor').value = state.accentColor || '#00d4ff';
+        document.getElementById('ltTextColor').value = state.textColor || '#ffffff';
+        document.getElementById('ltImageUrl').value = state.imageUrl || '';
+        document.getElementById('ltImageShape').value = state.imageShape || 'square';
+        updateStatus('ltStatus', 'Lower Third', state.visible);
+        setSectionVisible('lower-third', state.visible);
+    });
+
+    function updateLowerThird() {
+        fetch('/api/state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                line1: document.getElementById('line1').value,
+                line2: document.getElementById('line2').value,
+                position: document.getElementById('position').value,
+                textSize: document.getElementById('textSize').value,
+                duration: parseInt(document.getElementById('duration').value),
+                width: document.getElementById('ltWidth').value,
+                font: document.getElementById('ltFont').value,
+                customFontUrl: document.getElementById('ltCustomFontUrl').value,
+                customFontName: document.getElementById('ltCustomFontName').value,
+                style: document.getElementById('ltStyle').value,
+                bgColor: document.getElementById('ltBgColor').value,
+                accentColor: document.getElementById('ltAccentColor').value,
+                textColor: document.getElementById('ltTextColor').value,
+                imageUrl: document.getElementById('ltImageUrl').value,
+                imageShape: document.getElementById('ltImageShape').value
+            })
         });
-        
-        document.getElementById('logoOpacity').addEventListener('input', (e) => {
-            document.getElementById('opacityValue').textContent = e.target.value;
+    }
+
+    function showLowerThird() { updateLowerThird(); socket.emit('show'); }
+    function hideLowerThird()  { socket.emit('hide'); }
+
+    // ── RSS Ticker ──────────────────────────────────────────────────
+    socket.on('ticker_update', (state) => {
+        document.getElementById('feedUrl').value = state.feedUrl || '';
+        document.getElementById('tickerPosition').value = state.position;
+        document.getElementById('tickerTextSize').value = state.textSize;
+        document.getElementById('tickerSpeed').value = state.speed || 'medium';
+        document.getElementById('tickerFont').value = state.font || 'Segoe UI';
+        updateFeedItems(state.items);
+        updateStatus('tickerStatus', 'Ticker', state.visible);
+        setSectionVisible('rss-ticker', state.visible);
+    });
+
+    function loadFeed() {
+        const feedUrl = document.getElementById('feedUrl').value;
+        if (!feedUrl) { alert('Please enter an RSS feed URL'); return; }
+        fetch('/api/ticker', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedUrl: feedUrl })
+        }).then(res => res.json()).then(data => updateFeedItems(data.items));
+    }
+
+    function updateFeedItems(items) {
+        const container = document.getElementById('feedItems');
+        if (!items || items.length === 0) { container.innerHTML = '<p>No items found in feed.</p>'; return; }
+        container.innerHTML = items.map(item => `<p>${item}</p>`).join('');
+    }
+
+    function updateTicker() {
+        fetch('/api/ticker', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                position: document.getElementById('tickerPosition').value,
+                textSize: document.getElementById('tickerTextSize').value,
+                speed: document.getElementById('tickerSpeed').value,
+                font: document.getElementById('tickerFont').value
+            })
         });
-        
-        function updateLogo() {
-            fetch('/api/logo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    imageUrl: document.getElementById('logoUrl').value,
-                    position: document.getElementById('logoPosition').value,
-                    size: document.getElementById('logoSize').value,
-                    opacity: parseInt(document.getElementById('logoOpacity').value)
-                })
-            });
-        }
-        
-        function showLogo() { updateLogo(); socket.emit('logo_show'); }
-        function hideLogo() { socket.emit('logo_hide'); }
-        
-        // Title Card
-        socket.on('titlecard_update', (state) => {
-            document.getElementById('titleText').value = state.title;
-            document.getElementById('subtitleText').value = state.subtitle || '';
-            document.getElementById('titleBgColor').value = state.backgroundColor;
-            document.getElementById('titleTextColor').value = state.textColor;
-            document.getElementById('titleBgImage').value = state.backgroundImage || '';
-            document.getElementById('titleFont').value = state.font || 'Segoe UI';
-            updateTitlePreview();
-            updateStatus('titleStatus', 'Title Card', state.visible);
+    }
+
+    function showTicker() { updateTicker(); socket.emit('ticker_show'); }
+    function hideTicker() { socket.emit('ticker_hide'); }
+
+    // ── Logo Bug ────────────────────────────────────────────────────
+    socket.on('logo_update', (state) => {
+        document.getElementById('logoUrl').value = state.imageUrl || '';
+        document.getElementById('logoPosition').value = state.position;
+        document.getElementById('logoSize').value = state.size;
+        document.getElementById('logoOpacity').value = state.opacity;
+        document.getElementById('opacityValue').textContent = state.opacity;
+        updateStatus('logoStatus', 'Logo', state.visible);
+        setSectionVisible('logo-bug', state.visible);
+    });
+
+    document.getElementById('logoOpacity').addEventListener('input', (e) => {
+        document.getElementById('opacityValue').textContent = e.target.value;
+    });
+
+    function updateLogo() {
+        fetch('/api/logo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                imageUrl: document.getElementById('logoUrl').value,
+                position: document.getElementById('logoPosition').value,
+                size: document.getElementById('logoSize').value,
+                opacity: parseInt(document.getElementById('logoOpacity').value)
+            })
         });
-        
-        function updateTitlePreview() {
-            const preview = document.getElementById('titleCardPreview');
-            const bgImage = document.getElementById('titleBgImage').value;
-            if (bgImage) {
-                preview.style.background = `url('${bgImage}') center/cover`;
-            } else {
-                preview.style.background = document.getElementById('titleBgColor').value;
-            }
-            preview.style.color = document.getElementById('titleTextColor').value;
-            preview.style.fontFamily = document.getElementById('titleFont').value;
-            preview.querySelector('h3').textContent = document.getElementById('titleText').value;
-            preview.querySelector('p').textContent = document.getElementById('subtitleText').value;
-        }
-        
-        ['titleText', 'subtitleText', 'titleBgColor', 'titleTextColor', 'titleBgImage', 'titleFont'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateTitlePreview);
-            document.getElementById(id).addEventListener('change', updateTitlePreview);
+    }
+
+    function showLogo() { updateLogo(); socket.emit('logo_show'); }
+    function hideLogo() { socket.emit('logo_hide'); }
+
+    // ── Title Card ──────────────────────────────────────────────────
+    socket.on('titlecard_update', (state) => {
+        document.getElementById('titleText').value = state.title;
+        document.getElementById('subtitleText').value = state.subtitle || '';
+        document.getElementById('titleBgColor').value = state.backgroundColor;
+        document.getElementById('titleTextColor').value = state.textColor;
+        document.getElementById('titleBgImage').value = state.backgroundImage || '';
+        document.getElementById('titleFont').value = state.font || 'Segoe UI';
+        updateTitlePreview();
+        updateStatus('titleStatus', 'Title Card', state.visible);
+        setSectionVisible('title-card', state.visible);
+    });
+
+    function updateTitlePreview() {
+        const preview = document.getElementById('titleCardPreview');
+        const bgImage = document.getElementById('titleBgImage').value;
+        preview.style.background = bgImage ? `url('${bgImage}') center/cover` : document.getElementById('titleBgColor').value;
+        preview.style.color = document.getElementById('titleTextColor').value;
+        preview.style.fontFamily = document.getElementById('titleFont').value;
+        preview.querySelector('h3').textContent = document.getElementById('titleText').value;
+        preview.querySelector('p').textContent = document.getElementById('subtitleText').value;
+    }
+
+    ['titleText', 'subtitleText', 'titleBgColor', 'titleTextColor', 'titleBgImage', 'titleFont'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateTitlePreview);
+        document.getElementById(id).addEventListener('change', updateTitlePreview);
+    });
+
+    function updateTitleCard() {
+        fetch('/api/titlecard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: document.getElementById('titleText').value,
+                subtitle: document.getElementById('subtitleText').value,
+                backgroundColor: document.getElementById('titleBgColor').value,
+                textColor: document.getElementById('titleTextColor').value,
+                backgroundImage: document.getElementById('titleBgImage').value,
+                font: document.getElementById('titleFont').value
+            })
         });
-        
-        function updateTitleCard() {
-            fetch('/api/titlecard', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: document.getElementById('titleText').value,
-                    subtitle: document.getElementById('subtitleText').value,
-                    backgroundColor: document.getElementById('titleBgColor').value,
-                    textColor: document.getElementById('titleTextColor').value,
-                    backgroundImage: document.getElementById('titleBgImage').value,
-                    font: document.getElementById('titleFont').value
-                })
-            });
-        }
-        
-        function showTitleCard() { updateTitleCard(); socket.emit('titlecard_show'); }
-        function hideTitleCard() { socket.emit('titlecard_hide'); }
-        
-        // Social Bar
-        socket.on('social_update', (state) => {
-            document.getElementById('socialTwitter').value = state.twitter || '';
-            document.getElementById('socialYoutube').value = state.youtube || '';
-            document.getElementById('socialInstagram').value = state.instagram || '';
-            document.getElementById('socialTiktok').value = state.tiktok || '';
-            document.getElementById('socialFacebook').value = state.facebook || '';
-            document.getElementById('socialWebsite').value = state.website || '';
-            document.getElementById('socialPosition').value = state.position;
-            document.getElementById('socialFont').value = state.font || 'Segoe UI';
-            updateStatus('socialStatus', 'Social Bar', state.visible);
+    }
+
+    function showTitleCard() { updateTitleCard(); socket.emit('titlecard_show'); }
+    function hideTitleCard() { socket.emit('titlecard_hide'); }
+
+    // ── Social Bar ──────────────────────────────────────────────────
+    socket.on('social_update', (state) => {
+        document.getElementById('socialTwitter').value = state.twitter || '';
+        document.getElementById('socialYoutube').value = state.youtube || '';
+        document.getElementById('socialInstagram').value = state.instagram || '';
+        document.getElementById('socialTiktok').value = state.tiktok || '';
+        document.getElementById('socialFacebook').value = state.facebook || '';
+        document.getElementById('socialWebsite').value = state.website || '';
+        document.getElementById('socialPosition').value = state.position;
+        document.getElementById('socialFont').value = state.font || 'Segoe UI';
+        updateStatus('socialStatus', 'Social Bar', state.visible);
+        setSectionVisible('social-bar', state.visible);
+    });
+
+    function updateSocial() {
+        fetch('/api/social', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                twitter: document.getElementById('socialTwitter').value,
+                youtube: document.getElementById('socialYoutube').value,
+                instagram: document.getElementById('socialInstagram').value,
+                tiktok: document.getElementById('socialTiktok').value,
+                facebook: document.getElementById('socialFacebook').value,
+                website: document.getElementById('socialWebsite').value,
+                position: document.getElementById('socialPosition').value,
+                font: document.getElementById('socialFont').value
+            })
         });
-        
-        function updateSocial() {
-            fetch('/api/social', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    twitter: document.getElementById('socialTwitter').value,
-                    youtube: document.getElementById('socialYoutube').value,
-                    instagram: document.getElementById('socialInstagram').value,
-                    tiktok: document.getElementById('socialTiktok').value,
-                    facebook: document.getElementById('socialFacebook').value,
-                    website: document.getElementById('socialWebsite').value,
-                    position: document.getElementById('socialPosition').value,
-                    font: document.getElementById('socialFont').value
-                })
-            });
-        }
-        
-        function showSocial() { updateSocial(); socket.emit('social_show'); }
-        function hideSocial() { socket.emit('social_hide'); }
-        
-        // Breaking News
-        socket.on('breaking_update', (state) => {
-            document.getElementById('breakingText').value = state.text;
-            document.getElementById('breakingFont').value = state.font || 'Segoe UI';
-            document.getElementById('breakingPreview').textContent = state.text;
-            document.getElementById('breakingPreview').style.fontFamily = state.font || 'Segoe UI';
-            updateStatus('breakingStatus', 'Breaking News', state.visible);
+    }
+
+    function showSocial() { updateSocial(); socket.emit('social_show'); }
+    function hideSocial() { socket.emit('social_hide'); }
+
+    // ── Breaking News ───────────────────────────────────────────────
+    socket.on('breaking_update', (state) => {
+        document.getElementById('breakingText').value = state.text;
+        document.getElementById('breakingFont').value = state.font || 'Segoe UI';
+        document.getElementById('breakingPreview').textContent = state.text;
+        document.getElementById('breakingPreview').style.fontFamily = state.font || 'Segoe UI';
+        updateStatus('breakingStatus', 'Breaking News', state.visible);
+        setSectionVisible('breaking-news', state.visible);
+    });
+
+    document.getElementById('breakingText').addEventListener('input', (e) => {
+        document.getElementById('breakingPreview').textContent = e.target.value;
+    });
+    document.getElementById('breakingFont').addEventListener('change', (e) => {
+        document.getElementById('breakingPreview').style.fontFamily = e.target.value;
+    });
+
+    function updateBreaking() {
+        fetch('/api/breaking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: document.getElementById('breakingText').value,
+                font: document.getElementById('breakingFont').value
+            })
         });
-        
-        document.getElementById('breakingText').addEventListener('input', (e) => {
-            document.getElementById('breakingPreview').textContent = e.target.value;
-        });
-        
-        document.getElementById('breakingFont').addEventListener('change', (e) => {
-            document.getElementById('breakingPreview').style.fontFamily = e.target.value;
-        });
-        
-        function updateBreaking() {
-            fetch('/api/breaking', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    text: document.getElementById('breakingText').value,
-                    font: document.getElementById('breakingFont').value
-                })
-            });
-        }
-        
-        function showBreaking() { updateBreaking(); socket.emit('breaking_show'); }
-        function hideBreaking() { socket.emit('breaking_hide'); }
-        
-        // Multiview
-        socket.on('multiview_update', (state) => {
-            document.getElementById('mvQ1').value = state.q1 || 'all';
-            document.getElementById('mvQ2').value = state.q2 || 'all';
-            document.getElementById('mvQ3').value = state.q3 || 'all';
-            document.getElementById('mvQ4').value = state.q4 || 'all';
-        });
-        
-        function updateMultiviewQuadrant(quadrant, value) {
-            fetch('/api/multiview/set?' + quadrant + '=' + value);
-        }
-        
-        // Settings
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('active');
-            document.getElementById('saveMsg').className = 'save-msg';
-            document.getElementById('saveMsg').textContent = '';
-        }
-        
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
-        
-        function updateUrls() {
-            const port = document.getElementById('settingsPort').value || '5000';
-            document.getElementById('urlControl').textContent = 'http://localhost:' + port + '/';
-            document.getElementById('urlDisplay').textContent = 'http://localhost:' + port + '/display';
-            document.getElementById('urlMultiview').textContent = 'http://localhost:' + port + '/multiview';
-            document.getElementById('dockerCmd').textContent = 'docker run -p ' + port + ':5000 overlay-app';
-        }
-        
-        function savePort() {
-            const port = document.getElementById('settingsPort').value;
-            const msg = document.getElementById('saveMsg');
-            fetch('/api/config/port?port=' + port)
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status === 'ok') {
-                        msg.className = 'save-msg success';
-                        msg.textContent = 'Port saved to ' + data.port + '. When running locally, restart the app. In Docker, use: docker run -p ' + data.port + ':5000 overlay-app';
-                    } else {
-                        msg.className = 'save-msg error';
-                        msg.textContent = data.error || 'Failed to save port.';
-                    }
-                })
-                .catch(() => {
-                    msg.className = 'save-msg error';
-                    msg.textContent = 'Failed to save port.';
-                });
-        }
-        
-        document.getElementById('settingsModal').addEventListener('click', function(e) {
-            if (e.target === this) closeSettings();
-        });
-        
-        // Helper
-        function updateStatus(elementId, name, visible) {
-            const status = document.getElementById(elementId);
-            status.className = visible ? 'status visible' : 'status hidden';
-            status.textContent = `${name}: ${visible ? 'Visible' : 'Hidden'}`;
-        }
-    </script>
+    }
+
+    function showBreaking() { updateBreaking(); socket.emit('breaking_show'); }
+    function hideBreaking() { socket.emit('breaking_hide'); }
+
+    // ── Multiview ───────────────────────────────────────────────────
+    socket.on('multiview_update', (state) => {
+        document.getElementById('mvQ1').value = state.q1 || 'all';
+        document.getElementById('mvQ2').value = state.q2 || 'all';
+        document.getElementById('mvQ3').value = state.q3 || 'all';
+        document.getElementById('mvQ4').value = state.q4 || 'all';
+    });
+
+    function updateMultiviewQuadrant(quadrant, value) {
+        fetch('/api/multiview/set?' + quadrant + '=' + value);
+    }
+
+    // ── Settings modal ──────────────────────────────────────────────
+    function openSettings() {
+        document.getElementById('settingsModal').classList.add('active');
+        document.getElementById('saveMsg').className = 'save-msg';
+        document.getElementById('saveMsg').textContent = '';
+    }
+    function closeSettings() {
+        document.getElementById('settingsModal').classList.remove('active');
+    }
+    function updateUrls() {
+        const port = document.getElementById('settingsPort').value || '5000';
+        document.getElementById('urlControl').textContent   = 'http://localhost:' + port + '/';
+        document.getElementById('urlDisplay').textContent   = 'http://localhost:' + port + '/display';
+        document.getElementById('urlMultiview').textContent = 'http://localhost:' + port + '/multiview';
+        document.getElementById('dockerCmd').textContent    = 'docker run -p ' + port + ':5000 overlay-app';
+    }
+    function savePort() {
+        const port = document.getElementById('settingsPort').value;
+        const msg  = document.getElementById('saveMsg');
+        fetch('/api/config/port?port=' + port)
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    msg.className   = 'save-msg success';
+                    msg.textContent = 'Port saved to ' + data.port + '. When running locally, restart the app. In Docker, use: docker run -p ' + data.port + ':5000 overlay-app';
+                } else {
+                    msg.className   = 'save-msg error';
+                    msg.textContent = data.error || 'Failed to save port.';
+                }
+            })
+            .catch(() => { msg.className = 'save-msg error'; msg.textContent = 'Failed to save port.'; });
+    }
+    document.getElementById('settingsModal').addEventListener('click', function(e) {
+        if (e.target === this) closeSettings();
+    });
+
+    // ── Helper ──────────────────────────────────────────────────────
+    function updateStatus(elementId, name, visible) {
+        const el = document.getElementById(elementId);
+        el.className = visible ? 'status-compat visible' : 'status-compat hidden';
+        el.textContent = `${name}: ${visible ? 'Visible' : 'Hidden'}`;
+    }
+
+    // Init: hide Update button for multiview (no update action)
+    setActiveSection('lower-third');
+</script>
 </body>
 </html>
