@@ -1414,6 +1414,28 @@ Example:
     }
     socket.on('connect', () => console.log('Connected to server'));
 
+    // ── Rundown sync from API ────────────────────────────────────────
+    // When an external device (Stream Deck, Companion, etc.) calls a
+    // rundown API endpoint, the server broadcasts rundown_update so
+    // this panel stays in sync without a page refresh.
+    socket.on('rundown_update', (rd) => {
+        if (!rd.loaded || rd.total === 0) return;
+        // Only act if a rundown is loaded in the UI too
+        if (ltRundown.length === 0) return;
+        const i = rd.current_index;
+        if (i === ltRundownIdx) return; // already there
+        // Move highlight without re-triggering the server fetch
+        if (ltRundownIdx >= 0) {
+            const old = document.getElementById(`rdrow-${ltRundownIdx}`);
+            if (old) old.classList.remove('active');
+        }
+        ltRundownIdx = i;
+        const row = document.getElementById(`rdrow-${i}`);
+        if (row) { row.classList.add('active'); row.scrollIntoView({ block: 'nearest' }); }
+        if (ltRundown[i]) applyEntryToForm(ltRundown[i]);
+        updateRundownNav();
+    });
+
     // ── Sidebar navigation ──────────────────────────────────────────
     const SECTION_LABELS = {
         'multiview':     { short: 'Multiview',    update: null },
@@ -1599,6 +1621,12 @@ Example:
 
         renderRundown();
         selectRundownEntry(0);
+        // Sync to server so API endpoints can navigate the rundown
+        fetch('/api/rundown/load', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ltRundown)
+        });
         xmlMsg('ltXmlMsg', 'ok', `✓ Loaded ${ltRundown.length} entries`);
     }
 
@@ -1684,6 +1712,8 @@ Example:
         }
         applyEntryToForm(ltRundown[i]);
         updateRundownNav();
+        // Keep server index in sync so API status reflects UI selection
+        fetch(`/api/rundown/goto/${i + 1}`).catch(() => {});
     }
 
     function stepRundown(dir) {

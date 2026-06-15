@@ -82,6 +82,45 @@ multiview_state = {
     'q4': 'all'
 }
 
+rundown_state = {
+    'entries': [],        # list of lower-third field dicts
+    'current_index': -1,  # -1 = nothing loaded/selected
+    'loaded': False
+}
+
+RUNDOWN_FIELDS = [
+    'line1', 'line2', 'imageUrl', 'imageShape', 'position', 'style',
+    'width', 'textSize', 'font', 'duration', 'customFontUrl',
+    'customFontName', 'bgColor', 'accentColor', 'textColor'
+]
+
+def apply_rundown_entry(entry):
+    """Merge a rundown entry dict into lower_third_state (skip None/missing fields)."""
+    global lower_third_state
+    for field in RUNDOWN_FIELDS:
+        val = entry.get(field)
+        if val is not None and val != '':
+            if field == 'duration':
+                try:
+                    lower_third_state[field] = int(val)
+                except (ValueError, TypeError):
+                    pass
+            else:
+                lower_third_state[field] = val
+
+def _rundown_status():
+    idx = rundown_state['current_index']
+    total = len(rundown_state['entries'])
+    return {
+        'loaded': rundown_state['loaded'],
+        'total': total,
+        'current_index': idx,
+        'current_number': idx + 1 if idx >= 0 else 0,
+        'current_entry': rundown_state['entries'][idx] if 0 <= idx < total else None,
+        'has_next': idx < total - 1,
+        'has_prev': idx > 0,
+    }
+
 def strip_html(text):
     clean = re.compile('<.*?>')
     return re.sub(clean, '', text)
@@ -194,6 +233,7 @@ def handle_connect():
     emit('social_update', social_bar_state)
     emit('breaking_update', breaking_news_state)
     emit('multiview_update', multiview_state)
+    emit('rundown_update', _rundown_status())
 
 @socketio.on('show')
 def handle_show():
@@ -400,6 +440,105 @@ def http_hide_all():
     socketio.emit('social_update', social_bar_state)
     socketio.emit('breaking_update', breaking_news_state)
     return jsonify({'status': 'ok', 'message': 'All elements hidden'})
+
+# ── Rundown API ─────────────────────────────────────────────────────────────
+
+@app.route('/api/rundown/load', methods=['POST'])
+def rundown_load():
+    """Load a rundown from a JSON array of entry objects sent by the control page."""
+    global rundown_state
+    data = request.json
+    if not isinstance(data, list):
+        return jsonify({'error': 'Expected a JSON array of entries'}), 400
+    rundown_state['entries'] = data
+    rundown_state['current_index'] = 0 if data else -1
+    rundown_state['loaded'] = bool(data)
+    socketio.emit('rundown_update', _rundown_status())
+    return jsonify({'status': 'ok', **_rundown_status()})
+
+@app.route('/api/rundown/status')
+def rundown_status():
+    return jsonify(_rundown_status())
+
+@app.route('/api/rundown/next')
+def rundown_next():
+    global rundown_state, lower_third_state
+    idx = rundown_state['current_index']
+    total = len(rundown_state['entries'])
+    if total == 0:
+        return jsonify({'error': 'No rundown loaded'}), 400
+    if idx >= total - 1:
+        return jsonify({'error': 'Already at last entry', **_rundown_status()}), 400
+    rundown_state['current_index'] = idx + 1
+    apply_rundown_entry(rundown_state['entries'][rundown_state['current_index']])
+    lower_third_state['visible'] = True
+    socketio.emit('state_update', lower_third_state)
+    socketio.emit('rundown_update', _rundown_status())
+    return jsonify({'status': 'ok', **_rundown_status()})
+
+@app.route('/api/rundown/prev')
+def rundown_prev():
+    global rundown_state, lower_third_state
+    idx = rundown_state['current_index']
+    total = len(rundown_state['entries'])
+    if total == 0:
+        return jsonify({'error': 'No rundown loaded'}), 400
+    if idx <= 0:
+        return jsonify({'error': 'Already at first entry', **_rundown_status()}), 400
+    rundown_state['current_index'] = idx - 1
+    apply_rundown_entry(rundown_state['entries'][rundown_state['current_index']])
+    lower_third_state['visible'] = True
+    socketio.emit('state_update', lower_third_state)
+    socketio.emit('rundown_update', _rundown_status())
+    return jsonify({'status': 'ok', **_rundown_status()})
+
+@app.route('/api/rundown/goto/<int:n>')
+def rundown_goto(n):
+    """Go to entry by 1-based number (e.g. /api/rundown/goto/3 = third entry)."""
+    global rundown_state, lower_third_state
+    total = len(rundown_state['entries'])
+    if total == 0:
+        return jsonify({'error': 'No rundown loaded'}), 400
+    idx = n - 1  # convert to 0-based
+    if idx < 0 or idx >= total:
+        return jsonify({'error': f'Entry {n} out of range (1–{total})'}), 400
+    rundown_state['current_index'] = idx
+    apply_rundown_entry(rundown_state['entries'][idx])
+    lower_third_state['visible'] = True
+    socketio.emit('state_update', lower_third_state)
+    socketio.emit('rundown_update', _rundown_status())
+    return jsonify({'status': 'ok', **_rundown_status()})
+
+@app.route('/api/rundown/show')
+def rundown_show():
+    """Show the current rundown entry without advancing."""
+    global rundown_state, lower_third_state
+    idx = rundown_state['current_index']
+    total = len(rundown_state['entries'])
+    if total == 0 or idx < 0:
+        return jsonify({'error': 'No rundown entry selected'}), 400
+    apply_rundown_entry(rundown_state['entries'][idx])
+    lower_third_state['visible'] = True
+    socketio.emit('state_update', lower_third_state)
+    socketio.emit('rundown_update', _rundown_status())
+    return jsonify({'status': 'ok', **_rundown_status()})
+
+@app.route('/api/rundown/hide')
+def rundown_hide():
+    """Hide the lower third without changing rundown position."""
+    global lower_third_state
+    lower_third_state['visible'] = False
+    socketio.emit('state_update', lower_third_state)
+    return jsonify({'status': 'ok', 'visible': False, **_rundown_status()})
+
+@app.route('/api/rundown/clear')
+def rundown_clear():
+    global rundown_state
+    rundown_state['entries'] = []
+    rundown_state['current_index'] = -1
+    rundown_state['loaded'] = False
+    socketio.emit('rundown_update', _rundown_status())
+    return jsonify({'status': 'ok', **_rundown_status()})
 
 @app.route('/api/all_states', methods=['GET'])
 def get_all_states():
