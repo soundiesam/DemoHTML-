@@ -925,6 +925,10 @@ bgColor · accentColor · textColor   &lt;/lowerthird&gt;
                                 Load .xml file
                                 <input type="file" accept=".xml,text/xml" onchange="loadXmlFile(event,'ltXmlInput')">
                             </label>
+                            <button class="xml-file-label" style="border:none;cursor:pointer" onclick="downloadExampleXML()" title="Download a sample rundown XML file">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="9" x2="12" y2="3"/><polyline points="7 14 12 19 17 14"/></svg>
+                                Example .xml
+                            </button>
                             <button class="xml-apply-btn" onclick="applyLowerThirdXML()">Import</button>
                             <span class="xml-msg" id="ltXmlMsg"></span>
                         </div>
@@ -1698,6 +1702,97 @@ Example:
         document.getElementById('ltRundownPanel').classList.remove('visible');
         document.getElementById('ltRundownList').innerHTML = '';
         updateRundownNav();
+    }
+
+    function downloadExampleXML() {
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Lower Third Rundown Example
+  ─────────────────────────────────────────────────────────────
+  Use a <rundown> wrapper for multiple entries, or a bare
+  <lowerthird> element for a single entry.
+
+  All fields are optional — omit any you don't need.
+  Supported fields:
+    line1        Name / first line of text
+    line2        Title / second line of text
+    imageUrl     URL to a headshot or logo image
+    imageShape   square | circle | rounded
+    position     bottom-left | bottom-center | bottom-right
+                 top-left    | top-center    | top-right
+    style        modern | classic | minimal | bold |
+                 news   | elegant | neon    | glass
+    width        compact | full
+    textSize     small | medium | large | xlarge
+    font         Segoe UI | Arial | Helvetica | Georgia |
+                 Verdana  | Trebuchet MS | Impact | Courier New | custom
+    duration     Auto-hide seconds (0 = manual)
+    bgColor      Hex color e.g. #1a1a2e
+    accentColor  Hex color e.g. #00d4ff
+    textColor    Hex color e.g. #ffffff
+    customFontUrl    URL to a .woff2 / .ttf font file
+    customFontName   Name to register the custom font as
+-->
+<rundown>
+
+  <lowerthird>
+    <line1>Jane Doe</line1>
+    <line2>Lead Anchor</line2>
+    <position>bottom-left</position>
+    <style>modern</style>
+    <textSize>medium</textSize>
+    <bgColor>#1a1a2e</bgColor>
+    <accentColor>#00d4ff</accentColor>
+    <textColor>#ffffff</textColor>
+    <duration>0</duration>
+  </lowerthird>
+
+  <lowerthird>
+    <line1>Bob Smith</line1>
+    <line2>Sports Reporter</line2>
+    <position>bottom-left</position>
+    <style>news</style>
+    <textSize>large</textSize>
+    <bgColor>#1a0a0a</bgColor>
+    <accentColor>#e94560</accentColor>
+    <textColor>#ffffff</textColor>
+    <duration>8</duration>
+  </lowerthird>
+
+  <lowerthird>
+    <line1>Maria Chen</line1>
+    <line2>Weather Correspondent</line2>
+    <imageUrl>https://example.com/maria.jpg</imageUrl>
+    <imageShape>circle</imageShape>
+    <position>bottom-right</position>
+    <style>elegant</style>
+    <textSize>medium</textSize>
+    <width>compact</width>
+    <font>Georgia</font>
+    <bgColor>#0a1a0a</bgColor>
+    <accentColor>#4ade80</accentColor>
+    <textColor>#ffffff</textColor>
+    <duration>6</duration>
+  </lowerthird>
+
+  <lowerthird>
+    <line1>Dr. Alex Rivera</line1>
+    <line2>Technology Analyst</line2>
+    <position>bottom-center</position>
+    <style>glass</style>
+    <width>full</width>
+    <textSize>small</textSize>
+    <duration>0</duration>
+  </lowerthird>
+
+</rundown>
+`;
+        const blob = new Blob([xml], { type: 'application/xml' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'lowerthird-rundown-example.xml';
+        a.click();
+        URL.revokeObjectURL(a.href);
     }
 
     function applySocialXML() {
