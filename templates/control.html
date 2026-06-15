@@ -466,6 +466,113 @@
         .xml-msg.ok  { display: inline-block; color: #4ade80; background: rgba(74,222,128,0.1); }
         .xml-msg.err { display: inline-block; color: #f87171; background: rgba(248,113,113,0.1); }
 
+        /* ── Rundown Panel ────────────────────────────────────────── */
+        .rundown-panel {
+            display: none;
+            background: #131320;
+            border: 1px solid #2a2a3f;
+            border-left: 3px solid #06b6d4;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .rundown-panel.visible { display: block; }
+        .rundown-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #2a2a3f;
+        }
+        .rundown-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #06b6d4;
+            flex: 1;
+        }
+        .rundown-counter {
+            font-size: 12px;
+            color: #636e7b;
+            font-variant-numeric: tabular-nums;
+        }
+        .rundown-nav {
+            display: flex;
+            gap: 4px;
+        }
+        .rundown-nav button {
+            background: #1e1e2e;
+            border: 1px solid #3d3d5c;
+            border-radius: 5px;
+            color: #a9b1d6;
+            font-size: 14px;
+            width: 28px; height: 28px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .rundown-nav button:hover:not(:disabled) { background: #06b6d4; border-color: #06b6d4; color: #fff; }
+        .rundown-nav button:disabled { opacity: 0.35; cursor: default; }
+        .rundown-list {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .rundown-list::-webkit-scrollbar { width: 4px; }
+        .rundown-list::-webkit-scrollbar-track { background: transparent; }
+        .rundown-list::-webkit-scrollbar-thumb { background: #3d3d5c; border-radius: 2px; }
+        .rundown-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #1e1e2e;
+            transition: background 0.12s;
+        }
+        .rundown-row:last-child { border-bottom: none; }
+        .rundown-row:hover { background: #1e1e2e; }
+        .rundown-row.active { background: rgba(6,182,212,0.12); border-left: 3px solid #06b6d4; padding-left: 13px; }
+        .rundown-idx {
+            font-size: 11px;
+            color: #636e7b;
+            min-width: 22px;
+            font-variant-numeric: tabular-nums;
+        }
+        .rundown-row.active .rundown-idx { color: #06b6d4; }
+        .rundown-names { flex: 1; min-width: 0; }
+        .rundown-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rundown-title-text {
+            font-size: 11px;
+            color: #636e7b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .rundown-load-btn {
+            background: #06b6d4;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.15s, background 0.15s;
+            white-space: nowrap;
+        }
+        .rundown-row:hover .rundown-load-btn,
+        .rundown-row.active .rundown-load-btn { opacity: 1; }
+        .rundown-load-btn:hover { background: #0891b2; }
+
         /* ── Settings Modal ──────────────────────────────────────── */
         .modal-overlay {
             display: none;
@@ -799,32 +906,45 @@
                         <svg class="xml-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                     <div class="xml-import-body">
-                        <textarea id="ltXmlInput" spellcheck="false" placeholder="Paste XML here, or load a file below.
+                        <textarea id="ltXmlInput" spellcheck="false" placeholder="Single entry or a full rundown — both work.
 
-Supported tags:
-  &lt;line1&gt;  &lt;line2&gt;  &lt;imageUrl&gt;  &lt;imageShape&gt;
-  &lt;position&gt;  &lt;style&gt;  &lt;width&gt;  &lt;textSize&gt;
-  &lt;font&gt;  &lt;duration&gt;  &lt;bgColor&gt;  &lt;accentColor&gt;  &lt;textColor&gt;
-
-Example:
-&lt;lowerthird&gt;
-  &lt;line1&gt;Jane Doe&lt;/line1&gt;
-  &lt;line2&gt;Lead Anchor&lt;/line2&gt;
-  &lt;position&gt;bottom-left&lt;/position&gt;
-  &lt;style&gt;modern&lt;/style&gt;
-  &lt;bgColor&gt;#1a1a2e&lt;/bgColor&gt;
-  &lt;accentColor&gt;#00d4ff&lt;/accentColor&gt;
-&lt;/lowerthird&gt;"></textarea>
+Single:                         Rundown (series):
+&lt;lowerthird&gt;                    &lt;rundown&gt;
+  &lt;line1&gt;Jane Doe&lt;/line1&gt;        &lt;lowerthird&gt;
+  &lt;line2&gt;Anchor&lt;/line2&gt;            &lt;line1&gt;Jane Doe&lt;/line1&gt;
+&lt;/lowerthird&gt;                      &lt;line2&gt;Anchor&lt;/line2&gt;
+                                  &lt;/lowerthird&gt;
+Fields: line1 · line2 · imageUrl    &lt;lowerthird&gt;
+imageShape · position · style         &lt;line1&gt;Bob Smith&lt;/line1&gt;
+width · textSize · font · duration    &lt;line2&gt;Reporter&lt;/line2&gt;
+bgColor · accentColor · textColor   &lt;/lowerthird&gt;
+                                &lt;/rundown&gt;"></textarea>
                         <div class="xml-import-actions">
                             <label class="xml-file-label">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                                 Load .xml file
                                 <input type="file" accept=".xml,text/xml" onchange="loadXmlFile(event,'ltXmlInput')">
                             </label>
-                            <button class="xml-apply-btn" onclick="applyLowerThirdXML()">Apply to Form</button>
+                            <button class="xml-apply-btn" onclick="applyLowerThirdXML()">Import</button>
                             <span class="xml-msg" id="ltXmlMsg"></span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Rundown queue (shown when multiple entries imported) -->
+                <div class="rundown-panel" id="ltRundownPanel">
+                    <div class="rundown-header">
+                        <span class="rundown-title">
+                            <svg style="width:13px;height:13px;vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                            Rundown
+                        </span>
+                        <span class="rundown-counter" id="ltRundownCounter">0 / 0</span>
+                        <div class="rundown-nav">
+                            <button id="ltRundownPrev" onclick="stepRundown(-1)" title="Previous">&#8593;</button>
+                            <button id="ltRundownNext" onclick="stepRundown(1)"  title="Next">&#8595;</button>
+                        </div>
+                    </div>
+                    <div class="rundown-list" id="ltRundownList"></div>
                 </div>
 
                 <div class="form-card">
@@ -1427,6 +1547,10 @@ Example:
         }
     }
 
+    // ── Rundown state ───────────────────────────────────────────────
+    let ltRundown = [];       // array of parsed entry objects
+    let ltRundownIdx = -1;    // currently selected index (-1 = none)
+
     function applyLowerThirdXML() {
         const raw = document.getElementById('ltXmlInput').value.trim();
         if (!raw) { xmlMsg('ltXmlMsg', 'err', 'Nothing to parse'); return; }
@@ -1436,25 +1560,144 @@ Example:
             if (doc.querySelector('parsererror')) throw new Error();
         } catch(e) { xmlMsg('ltXmlMsg', 'err', 'Invalid XML'); return; }
 
-        const root = doc.querySelector('lowerthird') || doc.documentElement;
+        const entries = Array.from(doc.querySelectorAll('lowerthird'));
 
-        setField('line1',            getXmlVal(root, 'line1'));
-        setField('line2',            getXmlVal(root, 'line2'));
-        setField('ltImageUrl',       getXmlVal(root, 'imageUrl'));
-        setField('ltImageShape',     getXmlVal(root, 'imageShape'));
-        setField('position',         getXmlVal(root, 'position'));
-        setField('ltStyle',          getXmlVal(root, 'style'));
-        setField('ltWidth',          getXmlVal(root, 'width'));
-        setField('textSize',         getXmlVal(root, 'textSize'));
-        setField('ltFont',           getXmlVal(root, 'font'));
-        setField('duration',         getXmlVal(root, 'duration'));
-        setField('ltCustomFontUrl',  getXmlVal(root, 'customFontUrl'));
-        setField('ltCustomFontName', getXmlVal(root, 'customFontName'));
-        setField('ltBgColor',        getXmlVal(root, 'bgColor'));
-        setField('ltAccentColor',    getXmlVal(root, 'accentColor'));
-        setField('ltTextColor',      getXmlVal(root, 'textColor'));
+        if (entries.length === 0) {
+            xmlMsg('ltXmlMsg', 'err', 'No &lt;lowerthird&gt; elements found'); return;
+        }
 
-        xmlMsg('ltXmlMsg', 'ok', '✓ Applied — click Update Lower Third to push live');
+        if (entries.length === 1) {
+            // Single entry — apply directly and hide rundown
+            applyEntryToForm(entries[0]);
+            clearRundown();
+            xmlMsg('ltXmlMsg', 'ok', '✓ Applied — click Update Lower Third to push live');
+            return;
+        }
+
+        // Multiple entries — parse all and open rundown
+        ltRundown = entries.map(el => ({
+            line1:          getXmlVal(el, 'line1')          || '',
+            line2:          getXmlVal(el, 'line2')          || '',
+            imageUrl:       getXmlVal(el, 'imageUrl')       || '',
+            imageShape:     getXmlVal(el, 'imageShape'),
+            position:       getXmlVal(el, 'position'),
+            style:          getXmlVal(el, 'style'),
+            width:          getXmlVal(el, 'width'),
+            textSize:       getXmlVal(el, 'textSize'),
+            font:           getXmlVal(el, 'font'),
+            duration:       getXmlVal(el, 'duration'),
+            customFontUrl:  getXmlVal(el, 'customFontUrl'),
+            customFontName: getXmlVal(el, 'customFontName'),
+            bgColor:        getXmlVal(el, 'bgColor'),
+            accentColor:    getXmlVal(el, 'accentColor'),
+            textColor:      getXmlVal(el, 'textColor'),
+        }));
+
+        renderRundown();
+        selectRundownEntry(0);
+        xmlMsg('ltXmlMsg', 'ok', `✓ Loaded ${ltRundown.length} entries`);
+    }
+
+    function applyEntryToForm(entryOrObj) {
+        // Accept either a DOM element or a plain object
+        const g = typeof entryOrObj.querySelector === 'function'
+            ? tag => getXmlVal(entryOrObj, tag)
+            : tag => entryOrObj[tag === 'imageUrl' ? 'imageUrl'
+                              : tag === 'imageShape' ? 'imageShape'
+                              : tag === 'style' ? 'style'
+                              : tag === 'width' ? 'width'
+                              : tag === 'textSize' ? 'textSize'
+                              : tag === 'font' ? 'font'
+                              : tag === 'duration' ? 'duration'
+                              : tag === 'customFontUrl' ? 'customFontUrl'
+                              : tag === 'customFontName' ? 'customFontName'
+                              : tag === 'bgColor' ? 'bgColor'
+                              : tag === 'accentColor' ? 'accentColor'
+                              : tag === 'textColor' ? 'textColor'
+                              : tag];
+
+        const v = typeof entryOrObj.querySelector === 'function'
+            ? tag => getXmlVal(entryOrObj, tag)
+            : tag => entryOrObj[{
+                line1:'line1', line2:'line2', imageUrl:'imageUrl',
+                imageShape:'imageShape', position:'position', style:'style',
+                width:'width', textSize:'textSize', font:'font',
+                duration:'duration', customFontUrl:'customFontUrl',
+                customFontName:'customFontName', bgColor:'bgColor',
+                accentColor:'accentColor', textColor:'textColor'
+              }[tag]] ?? null;
+
+        setField('line1',            v('line1'));
+        setField('line2',            v('line2'));
+        setField('ltImageUrl',       v('imageUrl'));
+        setField('ltImageShape',     v('imageShape'));
+        setField('position',         v('position'));
+        setField('ltStyle',          v('style'));
+        setField('ltWidth',          v('width'));
+        setField('textSize',         v('textSize'));
+        setField('ltFont',           v('font'));
+        setField('duration',         v('duration'));
+        setField('ltCustomFontUrl',  v('customFontUrl'));
+        setField('ltCustomFontName', v('customFontName'));
+        setField('ltBgColor',        v('bgColor'));
+        setField('ltAccentColor',    v('accentColor'));
+        setField('ltTextColor',      v('textColor'));
+    }
+
+    function renderRundown() {
+        const list = document.getElementById('ltRundownList');
+        list.innerHTML = '';
+        ltRundown.forEach((e, i) => {
+            const row = document.createElement('div');
+            row.className = 'rundown-row';
+            row.id = `rdrow-${i}`;
+            row.innerHTML = `
+                <span class="rundown-idx">${i + 1}</span>
+                <span class="rundown-names">
+                    <div class="rundown-name">${e.line1 || '(no name)'}</div>
+                    <div class="rundown-title-text">${e.line2 || ''}</div>
+                </span>
+                <button class="rundown-load-btn" onclick="selectRundownEntry(${i});event.stopPropagation()">Load</button>`;
+            row.addEventListener('click', () => selectRundownEntry(i));
+            list.appendChild(row);
+        });
+        document.getElementById('ltRundownPanel').classList.add('visible');
+        updateRundownNav();
+    }
+
+    function selectRundownEntry(i) {
+        if (i < 0 || i >= ltRundown.length) return;
+        // Deactivate old row
+        if (ltRundownIdx >= 0) {
+            const old = document.getElementById(`rdrow-${ltRundownIdx}`);
+            if (old) old.classList.remove('active');
+        }
+        ltRundownIdx = i;
+        const row = document.getElementById(`rdrow-${i}`);
+        if (row) {
+            row.classList.add('active');
+            row.scrollIntoView({ block: 'nearest' });
+        }
+        applyEntryToForm(ltRundown[i]);
+        updateRundownNav();
+    }
+
+    function stepRundown(dir) {
+        selectRundownEntry(ltRundownIdx + dir);
+    }
+
+    function updateRundownNav() {
+        document.getElementById('ltRundownCounter').textContent =
+            ltRundown.length ? `${ltRundownIdx + 1} / ${ltRundown.length}` : '0 / 0';
+        document.getElementById('ltRundownPrev').disabled = ltRundownIdx <= 0;
+        document.getElementById('ltRundownNext').disabled = ltRundownIdx >= ltRundown.length - 1;
+    }
+
+    function clearRundown() {
+        ltRundown = []; ltRundownIdx = -1;
+        document.getElementById('ltRundownPanel').classList.remove('visible');
+        document.getElementById('ltRundownList').innerHTML = '';
+        updateRundownNav();
     }
 
     function applySocialXML() {
