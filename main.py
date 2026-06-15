@@ -365,6 +365,23 @@ def http_lt_show():
     socketio.emit('state_update', lower_third_state)
     return jsonify({'status': 'ok', 'visible': True})
 
+@app.route('/api/lowerthird/name')
+def http_lt_name():
+    """Return the current lower third name/title.
+
+    JSON (default):  {"line1": "Jane Doe", "line2": "Anchor", "visible": true}
+    Plain text:      GET /api/lowerthird/name?format=text  →  Jane Doe
+    With title:      GET /api/lowerthird/name?format=text&title=1  →  Jane Doe — Anchor
+    """
+    line1 = lower_third_state.get('line1', '')
+    line2 = lower_third_state.get('line2', '')
+    visible = lower_third_state.get('visible', False)
+    if request.args.get('format') == 'text':
+        if request.args.get('title') == '1' and line2:
+            return f'{line1} — {line2}', 200, {'Content-Type': 'text/plain; charset=utf-8'}
+        return line1, 200, {'Content-Type': 'text/plain; charset=utf-8'}
+    return jsonify({'line1': line1, 'line2': line2, 'visible': visible})
+
 @app.route('/api/lowerthird/hide')
 def http_lt_hide():
     global lower_third_state
