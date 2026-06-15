@@ -4,6 +4,8 @@ import feedparser
 import time
 import os
 import re
+import xml.etree.ElementTree as ET
+import urllib.request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'lower-third-secret'
@@ -107,6 +109,41 @@ def apply_rundown_entry(entry):
                     pass
             else:
                 lower_third_state[field] = val
+
+def _parse_xml_rundown(xml_text):
+    """Parse an XML string containing one or more <lowerthird> elements.
+    Accepts a bare <lowerthird>, a <rundown> wrapper, or any root element
+    that contains <lowerthird> children.
+    Returns a list of entry dicts (same shape as RUNDOWN_FIELDS).
+    Raises ValueError with a human-readable message on parse failure.
+    """
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as e:
+        raise ValueError(f'XML parse error: {e}')
+
+    # Collect all <lowerthird> elements wherever they live in the tree
+    if root.tag == 'lowerthird':
+        nodes = [root]
+    else:
+        nodes = root.findall('.//lowerthird')
+
+    if not nodes:
+        raise ValueError('No <lowerthird> elements found in the XML')
+
+    def txt(el, tag):
+        child = el.find(tag)
+        return child.text.strip() if child is not None and child.text else None
+
+    entries = []
+    for node in nodes:
+        entry = {}
+        for field in RUNDOWN_FIELDS:
+            val = txt(node, field)
+            if val is not None:
+                entry[field] = val
+        entries.append(entry)
+    return entries
 
 def _rundown_status():
     idx = rundown_state['current_index']
@@ -443,17 +480,58 @@ def http_hide_all():
 
 # ── Rundown API ─────────────────────────────────────────────────────────────
 
+def _set_rundown(entries):
+    """Store entries in rundown_state and broadcast the update."""
+    global rundown_state
+    rundown_state['entries'] = entries
+    rundown_state['current_index'] = 0 if entries else -1
+    rundown_state['loaded'] = bool(entries)
+    socketio.emit('rundown_update', _rundown_status())
+
 @app.route('/api/rundown/load', methods=['POST'])
 def rundown_load():
-    """Load a rundown from a JSON array of entry objects sent by the control page."""
+    """Load a rundown via POST.
+
+    Accepts two content types:
+      • application/json  — body is a JSON array of entry objects
+      • application/xml or text/xml — body is raw XML with <lowerthird> elements
+    """
     global rundown_state
-    data = request.json
-    if not isinstance(data, list):
-        return jsonify({'error': 'Expected a JSON array of entries'}), 400
-    rundown_state['entries'] = data
-    rundown_state['current_index'] = 0 if data else -1
-    rundown_state['loaded'] = bool(data)
-    socketio.emit('rundown_update', _rundown_status())
+    ct = request.content_type or ''
+    if 'xml' in ct:
+        try:
+            entries = _parse_xml_rundown(request.data.decode('utf-8'))
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+    else:
+        data = request.json
+        if not isinstance(data, list):
+            return jsonify({'error': 'Expected a JSON array of entries or XML body (Content-Type: application/xml)'}), 400
+        entries = data
+    _set_rundown(entries)
+    return jsonify({'status': 'ok', **_rundown_status()})
+
+@app.route('/api/rundown/load/url')
+def rundown_load_url():
+    """Load a rundown by fetching an XML file from a URL.
+
+    Usage: GET /api/rundown/load/url?url=https://example.com/rundown.xml
+    """
+    url = request.args.get('url', '').strip()
+    if not url:
+        return jsonify({'error': 'Missing required query parameter: url'}), 400
+    if not url.startswith(('http://', 'https://')):
+        return jsonify({'error': 'url must start with http:// or https://'}), 400
+    try:
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            xml_text = resp.read().decode('utf-8')
+    except Exception as e:
+        return jsonify({'error': f'Failed to fetch URL: {e}'}), 502
+    try:
+        entries = _parse_xml_rundown(xml_text)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    _set_rundown(entries)
     return jsonify({'status': 'ok', **_rundown_status()})
 
 @app.route('/api/rundown/status')
