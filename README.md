@@ -173,9 +173,50 @@ Query parameters for `/show` and `/update`:
 /api/lowerthird/show?line1=Jane%20Doe&line2=CEO&style=news&width=full
 ```
 
+### Lower Third Status
+
+| Endpoint | Description |
+|----------|-------------|
+| `/api/lowerthird/name` | Current name, title, and visibility as JSON |
+| `/api/lowerthird/name?format=text` | Name only as plain text — ideal for Stream Deck button titles |
+| `/api/lowerthird/name?format=text&title=1` | Name and title as plain text (`Jane Doe — Lead Anchor`) |
+
+`/api/lowerthird/name` JSON response:
+```json
+{ "line1": "Jane Doe", "line2": "Lead Anchor", "visible": true }
+```
+
 ### Lower Third Rundown
 
-Load a rundown via the control panel first (Import from XML), then drive it remotely:
+Load a rundown via the control panel **or** entirely via the API, then drive it remotely.
+
+#### Loading a rundown via API
+
+**POST raw XML** — send the XML body with `Content-Type: application/xml`:
+```bash
+curl -X POST http://localhost:5000/api/rundown/load \
+  -H "Content-Type: application/xml" \
+  --data-binary @rundown.xml
+```
+
+**Load from a URL** — fetch an XML file hosted anywhere:
+```
+GET /api/rundown/load/url?url=https://example.com/rundown.xml
+```
+
+**POST JSON** — send a JSON array of entry objects with `Content-Type: application/json`:
+```bash
+curl -X POST http://localhost:5000/api/rundown/load \
+  -H "Content-Type: application/json" \
+  -d '[{"line1":"Jane Doe","line2":"Anchor"},{"line1":"Bob Smith","line2":"Reporter"}]'
+```
+
+All three return the same response so you can confirm what loaded:
+```json
+{ "status": "ok", "loaded": true, "total": 3, "current_number": 1, "has_next": true, "has_prev": false, "current_entry": { "line1": "Jane Doe", ... } }
+```
+
+#### Navigating the rundown
 
 | Endpoint | Description |
 |----------|-------------|
